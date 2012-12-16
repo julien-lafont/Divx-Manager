@@ -46,7 +46,7 @@ function addFile($base, e) {
 	// Icone
 	var icone = "file.png";
 	if (e.extension == "avi" || e.extension == "mkv") icone = "file-avi.png";
-	else if (e.extension == "mpg" || e.extension == "mpg4") icone = "file-mp4.png";
+	else if (e.extension == "mpg" || e.extension == "mp4") icone = "file-mp4.png";
 	else if (e.extension == "mp3") icone = "file-mp3.png";
 	else if (e.extension == "mov") icone = "file-mov.png";
 	else if (!e.isFile) icone = "folder.png";
@@ -94,7 +94,7 @@ function addFile($base, e) {
 }
 
 function initOpenDirAction() {
-	$("#folders-menu").on('click', ".open-dir", function() {
+	$("#folders-menu, .breadcrumb").on('click', ".open-dir", function() {
 		var dir = $(this).data('directory');
 		var type = $(this).data('type');
 		var success = _.bind(function() {
@@ -111,8 +111,11 @@ function initOpenDirAction() {
 
 	$("#list-body").on('click', ".open-dir", function() {
 		var dir = $(this).data('directory');
-		loadFiles(dir);
-		$("#n2").html($("#folders-menu li.active").html() + "<span class='divider'>/</span>").removeClass('active');
-		$("#n3").html($(this).text()).addClass('active');
+		var success = _.bind(function() {
+			$("#n2").html($("#folders-menu li.active").html() + "<span class='divider'>/</span>").removeClass('active');
+			$("#n3").html($(this).text()).addClass('active');
+		}, this);
+		loadFiles(dir, success);
+		
 	});
 }
