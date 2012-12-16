@@ -42,7 +42,7 @@ function addFile($base, e) {
 	} else {
 		lien = "<a href='#' data-directory='"+e.path+"' class='open-dir' title='"+e.rawName+"'>"+e.name+"</a>";
 	}
-	
+
 	// Icone
 	var icone = "file.png";
 	if (e.extension == "avi" || e.extension == "mkv") icone = "file-avi.png";
@@ -94,13 +94,28 @@ function addFile($base, e) {
 }
 
 function initOpenDirAction() {
-	$("#folders-menu, .breadcrumb").on('click', ".open-dir", function() {
+	$("#folders-menu").on('click', ".open-dir", function() {
 		var dir = $(this).data('directory');
 		var type = $(this).data('type');
 		var success = _.bind(function() {
 			$("#folders-menu li").removeClass("active");
 			$(this).parent().addClass("active");
-			$("#n2").html($(this).text()).addClass('active');
+			$("#n2").text($(this).text()).addClass('active');
+			$("#n3").text("").removeClass('active');
+		}, this);
+		if (type == 'TvShow') {
+			loadFolders(dir, success);
+		} else {
+			loadFiles(dir, success);
+		}
+	});
+
+	$(".breadcrumb").on('click', ".open-dir", function() {
+		var dir = $(this).data('directory');
+		var type = $(this).data('type');
+		var success = _.bind(function() {
+			$("#n2").text($(this).text()).addClass('active');
+			$("#n3").text("").removeClass('active');
 		}, this);
 		if (type == 'TvShow') {
 			loadFolders(dir, success);
@@ -113,9 +128,8 @@ function initOpenDirAction() {
 		var dir = $(this).data('directory');
 		var success = _.bind(function() {
 			$("#n2").html($("#folders-menu li.active").html() + "<span class='divider'>/</span>").removeClass('active');
-			$("#n3").html($(this).text()).addClass('active');
+			$("#n3").text($(this).text()).addClass('active');
 		}, this);
 		loadFiles(dir, success);
-		
 	});
 }

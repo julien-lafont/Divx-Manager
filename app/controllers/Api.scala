@@ -99,7 +99,7 @@ object FileApi {
   }
 
   private def getSeason(name: String) = {
-    val regexSeason = """.*S([0-9]{1,2})E.*""".r
+    val regexSeason = """.*S([0-9]{1,2}).*""".r
     name.toUpperCase match {
       case regexSeason(season) => Some(season)
       case _ => None
