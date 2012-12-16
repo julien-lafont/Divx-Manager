@@ -29,7 +29,7 @@ object Api extends Controller {
 
   def listDirs(dir: String) = Action {
     val path = baseDir + dir
-    val folders = path ** IsDirectory
+    val folders = path.children(IsDirectory)
     Ok(Json.toJson(folders))
   }
 
