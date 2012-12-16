@@ -24,13 +24,15 @@ object Api extends Controller {
   def list(dir: String) = Action {
     val path = baseDir + dir
     val files = path **  ("*.{" + moviesExtensions.mkString(",") + "}")
-    Ok(Json.toJson(files))
+    val order = files.toList.sortBy(_.name)
+    Ok(Json.toJson(order))
   }
 
   def listDirs(dir: String) = Action {
     val path = baseDir + dir
     val folders = path.children(IsDirectory)
-    Ok(Json.toJson(folders))
+    val order = folders.toList.sortBy(_.name)
+    Ok(Json.toJson(order))
   }
 
   def roots = Action { implicit request =>
