@@ -100,8 +100,9 @@ object Api extends Controller {
       case "name" => file.name
       case "season" => "%s%s".format(file.details.season, file.details.episode).trim
       case "quality" => file.details.quality
-      case "size" => file.rawSize.toString
-      case "date" => file.rawLastModified.toString
+      case "size" => "%20d".format(file.rawSize)
+      case "date" => "%20d".format(file.rawLastModified)
+      case "year" => file.details.year
       case _ => file.name
     })
     if (sortOrder) order else order.reverse
@@ -122,7 +123,7 @@ object MyFile {
         lastModified = dateFormater.print(path.lastModified),
         rawLastModified = path.lastModified,
         size      = getSize(path.size).getOrElse(""),
-        rawSize   = path.size.getOrElse(0),
+        rawSize   = path.size.getOrElse(-1),
         isFile    = path.isFile,
         details = MyFileDetails(
           quality   = getQuality(path.name),
