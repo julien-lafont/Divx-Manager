@@ -189,6 +189,6 @@ function getIcone(file) {
 	else if (file.extension == "mpg" || file.extension == "mp4") icone = "file-mp4.png";
 	else if (file.extension == "mp3") icone = "file-mp3.png";
 	else if (file.extension == "mov") icone = "file-mov.png";
-	else if (!e.isFile) icone = "folder.png";
+	else if (!file.isFile) icone = "folder.png";
 	return "<img src='/assets/images/icones/"+icone+"' alt='"+file.extension+"' /> ";
 }
