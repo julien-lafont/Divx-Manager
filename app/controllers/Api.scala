@@ -15,6 +15,7 @@ import scala.math._
 import org.joda.time.format.DateTimeFormat
 import java.util.Locale
 import services.security.Identity
+import play.api.libs.iteratee._
   
 object Api extends Controller {
   
@@ -45,7 +46,30 @@ object Api extends Controller {
   }
 
   def download(path: String) = Action {
-    Ok.sendFile(new java.io.File(baseDir + path))
+    val content = new java.io.File(baseDir + path)
+    SimpleResult(
+      header = ResponseHeader(OK, Map(
+        CONTENT_LENGTH -> content.length.toString,
+        CONTENT_TYPE -> play.api.libs.MimeTypes.forFileName(content.getName).getOrElse(play.api.http.ContentTypes.BINARY),
+        CONTENT_DISPOSITION -> ("""attachment; filename="%s"""".format(content.getName))
+        )),
+      Enumerator.fromFile(content)
+    )
+    // Use this when PR617 will be merged (https://github.com/playframework/Play20/pull/617)
+    //Ok.sendFile(new java.io.File(baseDir + path))
+  }
+
+  def open(path: String) = Action {
+    val content = new java.io.File(baseDir + path)
+    SimpleResult(
+      header = ResponseHeader(OK, Map(
+        CONTENT_LENGTH -> content.length.toString,
+        CONTENT_TYPE -> play.api.libs.MimeTypes.forFileName(content.getName).getOrElse(play.api.http.ContentTypes.BINARY)
+        )),
+      Enumerator.fromFile(content)
+    )
+    // Use this when PR617 will be merged (https://github.com/playframework/Play20/pull/617)
+    Ok.sendFile(content = new java.io.File(baseDir + path), inline = true)
   }
 
 }

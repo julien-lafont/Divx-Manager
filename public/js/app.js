@@ -44,13 +44,16 @@ function addFile($base, e) {
 	}
 
 	// Icone
+	html += "<td>";
 	var icone = "file.png";
 	if (e.extension == "avi" || e.extension == "mkv") icone = "file-avi.png";
 	else if (e.extension == "mpg" || e.extension == "mp4") icone = "file-mp4.png";
 	else if (e.extension == "mp3") icone = "file-mp3.png";
 	else if (e.extension == "mov") icone = "file-mov.png";
 	else if (!e.isFile) icone = "folder.png";
-	html += "<td><img src='/assets/images/icones/"+icone+"' alt='"+e.extension+"' /></td>";
+	html += "<img src='/assets/images/icones/"+icone+"' alt='"+e.extension+"' /> ";
+	html += "<a href='/api/open/"+e.path+"'><img src='/assets/images/play.png' title='Lire le fichier directement' /></a>";
+	html += "</td>";
 
 	// Nom
 	html += "<td>";
