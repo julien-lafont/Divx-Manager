@@ -9,7 +9,7 @@ import Path._
 import scalax.file.PathMatcher._
 import play.api.libs.json.Json
 import play.api.libs.json._
-import FileApi._
+import play.api.libs.functional.syntax._
 import scala.collection.JavaConversions._
 import scala.math._
 import org.joda.time.format.DateTimeFormat
@@ -18,22 +18,43 @@ import services.security.Identity
 import play.api.libs.iteratee._
   
 object Api extends Controller {
+
+  implicit val myFileDetailsWriter = (
+    (__ \ "quality").write[String] and
+    (__ \ "lang").write[String] and
+    (__ \ "year").write[String] and
+    (__ \ "season").write[String] and
+    (__ \ "episode").write[String]
+  )(unlift(MyFileDetails.unapply))
+
+  implicit val myFileWriter = (
+    (__ \ "name").write[String] and
+    (__ \ "rawName").write[String] and
+    (__ \ "path").write[String] and
+    (__ \ "extension").write[String] and
+    (__ \ "lastModified").write[String] and
+    (__ \ "rawLastModified").write[Long] and
+    (__ \ "size").write[String] and
+    (__ \ "rawSize").write[Long] and
+    (__ \ "isFile").write[Boolean] and
+    (__ \ "details").write[MyFileDetails]
+  )(unlift(MyFile.unapply))
   
   val baseDir = "./links"
   val moviesExtensions = Seq("avi", "wmv", "mkv", "mp4", "mpg")
 
-  def list(dir: String) = Action {
+  def list(dir: String) = Action { implicit request =>
     val path = baseDir + dir
     val files = path **  ("*.{" + moviesExtensions.mkString(",") + "}")
-    val order = files.toList.sortBy(_.name)
-    Ok(Json.toJson(order))
+    val elems = sort(files.toList.map(MyFile(_)))
+    Ok(Json.toJson(elems))
   }
 
-  def listDirs(dir: String) = Action {
+  def listDirs(dir: String) = Action { implicit request =>
     val path = baseDir + dir
     val folders = path.children(IsDirectory)
-    val order = folders.toList.sortBy(_.name)
-    Ok(Json.toJson(order))
+    val elems = sort(folders.toList.map(MyFile(_)))
+    Ok(Json.toJson(elems))
   }
 
   def roots = Action { implicit request =>
@@ -72,9 +93,46 @@ object Api extends Controller {
     Ok.sendFile(content = new java.io.File(baseDir + path), inline = true)
   }
 
+  private def sort(list: List[MyFile])(implicit request: RequestHeader) = {
+    val sortColumn = request.getQueryString("column").getOrElse("name")
+    val sortOrder = request.getQueryString("order").getOrElse("asc") == "asc"
+    val order = list.sortBy(file => sortColumn match {
+      case "name" => file.name
+      case "season" => "%s%s".format(file.details.season, file.details.episode).trim
+      case "quality" => file.details.quality
+      case "size" => file.rawSize.toString
+      case "date" => file.rawLastModified.toString
+      case _ => file.name
+    })
+    if (sortOrder) order else order.reverse
+  }
 }
 
-object FileApi {
+case class MyFile(name: String, rawName: String, path: String, extension: String, lastModified: String, rawLastModified: Long,
+    size: String, rawSize: Long, isFile: Boolean, details: MyFileDetails)
+case class MyFileDetails(quality: String, lang: String, year: String, season: String, episode: String)
+
+object MyFile {
+  def apply(path: Path): MyFile = {
+    MyFile(
+        name      = getCleanName(path.name),
+        rawName   = path.name,
+        path      = path.relativize(Api.baseDir).path,
+        extension = path.extension.getOrElse(""),
+        lastModified = dateFormater.print(path.lastModified),
+        rawLastModified = path.lastModified,
+        size      = getSize(path.size).getOrElse(""),
+        rawSize   = path.size.getOrElse(0),
+        isFile    = path.isFile,
+        details = MyFileDetails(
+          quality   = getQuality(path.name),
+          lang      = getLang(path.name),
+          year      = getYear(path.name).getOrElse(""),
+          season    = getSeason(path.name).getOrElse(""),
+          episode   = getEpisode(path.name).getOrElse("")
+        )
+     )
+  }
 
   private lazy val conf = play.api.Play.current.configuration.getConfig("config").get
   private val qualities = conf.getStringList("formats").get.toSeq
@@ -82,27 +140,6 @@ object FileApi {
   private val badKeywords = conf.getStringList("blacklist").get.toSeq
 
   private val dateFormater = DateTimeFormat.shortDateTime.withLocale(Locale.FRANCE)
-
-  implicit def pathWritter : Writes[Path] = new Writes[Path] {
-    def writes(path: Path) = {
-      Json.obj(
-        "name"      -> getCleanName(path.name),
-        "rawName" -> path.name,
-        "path"  -> path.relativize(Api.baseDir).path,
-        "extension" -> path.extension,
-        "lastModified" -> dateFormater.print(path.lastModified),
-        "size"      -> getSize(path.size),
-        "isFile" -> path.isFile,
-        "details" -> Json.obj(
-          "quality"   -> getQuality(path.name),
-          "lang"      -> getLang(path.name),
-          "year"      -> getYear(path.name),
-          "season"    -> getSeason(path.name),
-          "episode"   -> getEpisode(path.name)
-        )
-      )
-    }
-  }
 
   private def getQuality(name: String) = {
     qualities.filter(quality => name.toLowerCase.contains(quality)).headOption.getOrElse("sd")
@@ -161,4 +198,10 @@ object FileApi {
         mo + " mo"
     }
   }
+}
+
+object MyFileJson {
+
+  
+
 }

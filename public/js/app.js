@@ -2,23 +2,26 @@
 $(function() {
 	loadMenu();
 	initOpenDirAction();
+	initReorderLinks();
 });
 
 var lastPath;
 var lastType;
 
-function load(path, type, success) {
+function load(path, type, success, order) {
+	if (order == undefined) order = "";
+
 	if (type == "files") {
-		loadFiles(path, success);
+		loadFiles(path, success, order);
 	} else {
-		loadFolders(path, success);
+		loadFolders(path, success, order);
 	}
 	lastPath = path;
 	lastType = type;
 }
 
-function loadFiles(path, success) {
-	$.get("/api/list/files/"+path, function(files) {
+function loadFiles(path, success, order) {
+	$.get("/api/list/files/"+path+"?"+order, function(files) {
 		var $base = $("#list-body").empty();
 		_.each(files, function(file) {
 			addFile($base, file);
@@ -27,8 +30,8 @@ function loadFiles(path, success) {
 	});
 }
 
-function loadFolders(path, success) {
-	$.get("/api/list/folders/"+path, function(files) {
+function loadFolders(path, success, order) {
+	$.get("/api/list/folders/"+path+"?"+order, function(files) {
 		var $base = $("#list-body").empty();
 		_.each(files, function(file) {
 			addFile($base, file);
@@ -117,6 +120,7 @@ function initOpenDirAction() {
 			$(this).parent().addClass("active");
 			$("#n2").text($(this).text()).addClass('active');
 			$("#n3").text("").removeClass('active');
+			resetOrder();
 		}, this);
 		if (type == 'TvShow') {
 			load(dir, 'folders', success);
@@ -131,6 +135,7 @@ function initOpenDirAction() {
 		var success = _.bind(function() {
 			$("#n2").text($(this).text()).addClass('active');
 			$("#n3").text("").removeClass('active');
+			resetOrder();
 		}, this);
 		if (type == 'TvShow') {
 			load(dir, 'folders', success);
@@ -144,7 +149,28 @@ function initOpenDirAction() {
 		var success = _.bind(function() {
 			$("#n2").html($("#folders-menu li.active").html() + "<span class='divider'>/</span>").removeClass('active');
 			$("#n3").text($(this).text()).addClass('active');
+			resetOrder();
 		}, this);
 		load(dir, 'files', success);
 	});
+}
+
+function initReorderLinks() {
+	$(".link-reload").on('click', function() {
+		var tri = $(this).data('order');
+
+		$(".link-reload i").remove();
+		$(this).prepend("<i class='icon-chevron-"+(tri=="asc" ? "up" : "down")+"'></i>");
+		$(this).data('order', (tri == 'asc' ? 'desc' : 'asc'));
+
+		var order = "column="+$(this).data('column')+"&order="+tri;
+		load(lastPath, lastType, function() { }, order);
+	});
+}
+
+function resetOrder() {
+	$(".link-reload").each(function() {
+		$(this).data('order', 'asc');
+	});
+	$(".link-reload i").remove();
 }
