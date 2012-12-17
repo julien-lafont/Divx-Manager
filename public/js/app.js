@@ -1,6 +1,7 @@
 // Codé à l'arrache complète ! Et j'assume ;)
 $(function() {
 	loadMenu();
+	loadTop10();
 	initOpenDirAction();
 	initReorderLinks();
 });
@@ -50,6 +51,15 @@ function loadMenu() {
 	});
 }
 
+function loadTop10() {
+	$.get("/api/newFiles", function(files) {
+		var $base = $("#last-menu");
+		_.each(files, function(file) {
+			$base.append("<li><a href='/api/download/"+file.path+"' title='"+file.rawName+"'>"+getIcone(file)+" "+file.name+"</a></li>");
+		});
+	});
+}
+
 function addFile($base, e) {
 	var html = "<tr>";
 	var lien = "";
@@ -61,13 +71,7 @@ function addFile($base, e) {
 
 	// Icone
 	html += "<td>";
-	var icone = "file.png";
-	if (e.extension == "avi" || e.extension == "mkv") icone = "file-avi.png";
-	else if (e.extension == "mpg" || e.extension == "mp4") icone = "file-mp4.png";
-	else if (e.extension == "mp3") icone = "file-mp3.png";
-	else if (e.extension == "mov") icone = "file-mov.png";
-	else if (!e.isFile) icone = "folder.png";
-	html += "<img src='/assets/images/icones/"+icone+"' alt='"+e.extension+"' /> ";
+	html += getIcone(e);
 	html += "</td>";
 
 	// Nom
@@ -112,7 +116,8 @@ function addFile($base, e) {
 }
 
 function initOpenDirAction() {
-	$("#folders-menu").on('click', ".open-dir", function() {
+	$("#folders-menu").on('click', ".open-dir", function(e) {
+		e.preventDefault();
 		var dir = $(this).data('directory');
 		var type = $(this).data('type');
 		var success = _.bind(function() {
@@ -129,7 +134,8 @@ function initOpenDirAction() {
 		}
 	});
 
-	$(".breadcrumb").on('click', ".open-dir", function() {
+	$(".breadcrumb").on('click', ".open-dir", function(e) {
+		e.preventDefault();
 		var dir = $(this).data('directory');
 		var type = $(this).data('type');
 		var success = _.bind(function() {
@@ -144,7 +150,8 @@ function initOpenDirAction() {
 		}
 	});
 
-	$("#list-body").on('click', ".open-dir", function() {
+	$("#list-body").on('click', ".open-dir", function(e) {
+		e.preventDefault();
 		var dir = $(this).data('directory');
 		var success = _.bind(function() {
 			$("#n2").html($("#folders-menu li.active").html() + "<span class='divider'>/</span>").removeClass('active');
@@ -156,7 +163,8 @@ function initOpenDirAction() {
 }
 
 function initReorderLinks() {
-	$(".link-reload").on('click', function() {
+	$(".link-reload").on('click', function(e) {
+		e.preventDefault();
 		var tri = $(this).data('order');
 
 		$(".link-reload i").remove();
@@ -173,4 +181,14 @@ function resetOrder() {
 		$(this).data('order', 'asc');
 	});
 	$(".link-reload i").remove();
+}
+
+function getIcone(file) {
+	var icone = "file.png";
+	if (file.extension == "avi" || file.extension == "mkv") icone = "file-avi.png";
+	else if (file.extension == "mpg" || file.extension == "mp4") icone = "file-mp4.png";
+	else if (file.extension == "mp3") icone = "file-mp3.png";
+	else if (file.extension == "mov") icone = "file-mov.png";
+	else if (!e.isFile) icone = "folder.png";
+	return "<img src='/assets/images/icones/"+icone+"' alt='"+file.extension+"' /> ";
 }

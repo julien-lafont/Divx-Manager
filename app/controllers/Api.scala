@@ -16,6 +16,8 @@ import org.joda.time.format.DateTimeFormat
 import java.util.Locale
 import services.security.Identity
 import play.api.libs.iteratee._
+import play.api.cache.Cache
+import play.api.Play.current
   
 object Api extends Controller {
 
@@ -44,17 +46,23 @@ object Api extends Controller {
   val moviesExtensions = Seq("avi", "wmv", "mkv", "mp4", "mpg")
 
   def list(dir: String) = Action { implicit request =>
-    val path = baseDir + dir
-    val files = path **  ("*.{" + moviesExtensions.mkString(",") + "}")
-    val elems = sort(files.toList.map(MyFile(_)))
-    Ok(Json.toJson(elems))
+    val json = Cache.getOrElse(getCacheKey(dir, "files"), 60*5){
+      val path = baseDir + dir
+      val files = path **  ("*.{" + moviesExtensions.mkString(",") + "}")
+      val elems = sort(files.toList.map(MyFile(_)))
+      Json.toJson(elems)
+    }
+    Ok(json)
   }
 
   def listDirs(dir: String) = Action { implicit request =>
-    val path = baseDir + dir
-    val folders = path.children(IsDirectory)
-    val elems = sort(folders.toList.map(MyFile(_)))
-    Ok(Json.toJson(elems))
+    val json = Cache.getOrElse(getCacheKey(dir, "dirs"), 60*5){
+      val path = baseDir + dir
+      val folders = path.children(IsDirectory)
+      val elems = sort(folders.toList.map(MyFile(_)))
+      Json.toJson(elems)
+    }
+    Ok(json)
   }
 
   def roots = Action { implicit request =>
@@ -93,6 +101,17 @@ object Api extends Controller {
     Ok.sendFile(content = new java.io.File(baseDir + path), inline = true)
   }
 
+  def newFiles = Action { implicit request =>
+    val json = Cache.getOrElse("top10", 60*10){
+      val identity = Identity.get
+      val paths = identity.get.folders.map(f => baseDir + '/' + f.path);
+      val files = paths.flatMap(p => p ** ("*.{" + moviesExtensions.mkString(",") + "}"))
+      val top10 = files.sortBy(_.lastModified).reverse.take(10)
+      Json.toJson(top10.map(MyFile(_)))
+    }
+    Ok(json)
+  }
+
   private def sort(list: List[MyFile])(implicit request: RequestHeader) = {
     val sortColumn = request.getQueryString("column").getOrElse("name")
     val sortOrder = request.getQueryString("order").getOrElse("asc") == "asc"
@@ -107,6 +126,11 @@ object Api extends Controller {
     })
     if (sortOrder) order else order.reverse
   }
+
+  private def getCacheKey(dir: String, what: String)(implicit req: RequestHeader) = {
+    Seq(what, dir, req.queryString.toString).mkString("-")
+  }
+
 }
 
 case class MyFile(name: String, rawName: String, path: String, extension: String, lastModified: String, rawLastModified: Long,
