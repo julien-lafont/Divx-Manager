@@ -4,6 +4,19 @@ $(function() {
 	initOpenDirAction();
 });
 
+var lastPath;
+var lastType;
+
+function load(path, type, success) {
+	if (type == "files") {
+		loadFiles(path, success);
+	} else {
+		loadFolders(path, success);
+	}
+	lastPath = path;
+	lastType = type;
+}
+
 function loadFiles(path, success) {
 	$.get("/api/list/files/"+path, function(files) {
 		var $base = $("#list-body").empty();
@@ -52,7 +65,6 @@ function addFile($base, e) {
 	else if (e.extension == "mov") icone = "file-mov.png";
 	else if (!e.isFile) icone = "folder.png";
 	html += "<img src='/assets/images/icones/"+icone+"' alt='"+e.extension+"' /> ";
-	html += "<a href='/api/open/"+e.path+"'><img src='/assets/images/play.png' title='Lire le fichier directement' /></a>";
 	html += "</td>";
 
 	// Nom
@@ -107,9 +119,9 @@ function initOpenDirAction() {
 			$("#n3").text("").removeClass('active');
 		}, this);
 		if (type == 'TvShow') {
-			loadFolders(dir, success);
+			load(dir, 'folders', success);
 		} else {
-			loadFiles(dir, success);
+			load(dir, 'files', success);
 		}
 	});
 
@@ -121,9 +133,9 @@ function initOpenDirAction() {
 			$("#n3").text("").removeClass('active');
 		}, this);
 		if (type == 'TvShow') {
-			loadFolders(dir, success);
+			load(dir, 'folders', success);
 		} else {
-			loadFiles(dir, success);
+			load(dir, 'files', success);
 		}
 	});
 
@@ -133,6 +145,6 @@ function initOpenDirAction() {
 			$("#n2").html($("#folders-menu li.active").html() + "<span class='divider'>/</span>").removeClass('active');
 			$("#n3").text($(this).text()).addClass('active');
 		}, this);
-		loadFiles(dir, success);
+		load(dir, 'files', success);
 	});
 }
