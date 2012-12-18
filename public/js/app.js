@@ -101,7 +101,8 @@ function addFile($base, e) {
 
 	// Langue
 	if (e.details.lang == "vostfr") html += "<span class='label'>vostfr</span> ";
-	if (e.details.lang == "vo")  html += "<span class='label label-success'>vo</span> ";
+	if (e.details.lang == "multi") html += "<span class='label label-success'>multi</span> ";
+	if (e.details.lang == "vo")  html += "<span class='label label-warning'>vo</span> ";
 
 	html += "</td>";
 
