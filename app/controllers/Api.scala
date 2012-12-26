@@ -203,15 +203,16 @@ object MyFile {
   }
 
   private def getCleanName(name: String) = {
-   val tmp = name.toLowerCase
+   val tmp = name//.toLowerCase
        .replaceAll(Api.moviesExtensions.map("\\."+_).mkString("|"), "") // Remove extensions
        .replaceAll("""\[.*\]""", "") // Remove quality/lang
        .replaceAll("""\(.*\)""", "") // Remove year
-       .replaceAll("""[-_\.]""", " ") // Replace special chars by space
+       .replaceAll("""[_\.]""", " ") // Replace special chars by space
        .replaceAll(badKeywords.mkString(" ", "| ", ""), " ") // Remove blacklisted keywords
        .replaceAll("""[ ]{1,99}""", " ") // Remove unnecessary spaces
        .trim
-   tmp(0).toString.toUpperCase + tmp.drop(1) // Capitalize name
+   //tmp(0).toString.toUpperCase + tmp.drop(1) // Capitalize name
+       tmp
   }
 
   private def getSize(size: Option[Long]) = {
