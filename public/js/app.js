@@ -64,9 +64,10 @@ function addFile($base, e) {
 	var html = "<tr>";
 	var lien = "";
 	if (e.isFile) {
-		lien = "<a href='/api/download/"+e.path+"' title='"+e.rawName+"'>"+e.name+"</a>";
+                console.log(e.path);
+		lien = "<a href=\"/api/download/"+e.path+"\" title=\""+e.rawName+"\">"+e.name+"</a>";
 	} else {
-		lien = "<a href='#' data-directory='"+e.path+"' class='open-dir' title='"+e.rawName+"'>"+e.name+"</a>";
+		lien = "<a href='#' data-directory=\""+e.path+"\" class='open-dir' title=\""+e.rawName+"\">"+e.name+"</a>";
 	}
 
 	// Icone
