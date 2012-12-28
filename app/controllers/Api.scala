@@ -116,13 +116,13 @@ object Api extends Controller {
     val sortColumn = request.getQueryString("column").getOrElse("name")
     val sortOrder = request.getQueryString("order").getOrElse("asc") == "asc"
     val order = list.sortBy(file => sortColumn match {
-      case "name" => file.name
+      case "name" => file.name.toLowerCase
       case "season" => "%s%s".format(file.details.season, file.details.episode).trim
       case "quality" => file.details.quality
       case "size" => "%20d".format(file.rawSize)
       case "date" => "%20d".format(file.rawLastModified)
       case "year" => file.details.year
-      case _ => file.name
+      case _ => file.name.toLowerCase
     })
     if (sortOrder) order else order.reverse
   }
