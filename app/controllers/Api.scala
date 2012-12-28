@@ -102,11 +102,11 @@ object Api extends Controller {
   }
 
   def newFiles = Action { implicit request =>
-    val json = Cache.getOrElse("top10", 60*10){
+    val json = Cache.getOrElse("top10", 60*5){
       val identity = Identity.get
       val paths = identity.get.folders.map(f => baseDir + '/' + f.path);
       val files = paths.flatMap(p => p ** ("*.{" + moviesExtensions.mkString(",") + "}"))
-      val top10 = files.sortBy(_.lastModified).reverse.take(10)
+      val top10 = files.sortBy(_.lastModified).reverse.take(20)
       Json.toJson(top10.map(MyFile(_)))
     }
     Ok(json)
