@@ -110,7 +110,7 @@ object Api extends Controller {
 
   def stream(quality: String, path: String) = Action {
     streamQuality.get(quality).map{ qualityArgs => 
-      val cmd = "avconv -v warning -i pipe:0 -vcodec libx264 -acodec libfaac "+qualityArgs+" -t 60 -ss 190 pipe:1"
+      val cmd = "avconv -v warning -i pipe:0 -vcodec libx264 -acodec libfaac -threads 2 "+qualityArgs+" -t 60 -ss 190 pipe:1"
       println(cmd)
       val convertVideo = CLI.pipe(cmd)
       val stream = Enumerator.fromFile(new java.io.File(baseDir + path))

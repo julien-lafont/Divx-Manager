@@ -12,7 +12,7 @@ GET     /api/roots					controllers.Api.roots
 
 GET     /api/download*file          controllers.Api.download(file)
 GET     /api/open*file              controllers.Api.open(file)
-GET     /api/stream/:quality/*file  controllers.Api.stream(quality, file)
+GET     /api/stream/:quality*file  controllers.Api.stream(quality, file)
 
 GET     /api/newFiles               controllers.Api.newFiles
 
