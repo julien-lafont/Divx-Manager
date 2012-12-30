@@ -18,6 +18,9 @@ import services.security.Identity
 import play.api.libs.iteratee._
 import play.api.cache.Cache
 import play.api.Play.current
+import views.html.defaultpages.badRequest
+import services.CLI
+import play.api.libs.concurrent.Execution.Implicits._
   
 object Api extends Controller {
 
@@ -44,6 +47,10 @@ object Api extends Controller {
   
   val baseDir = "./links"
   val moviesExtensions = Seq("avi", "wmv", "mkv", "mp4", "mpg")
+  val streamQuality = Map(
+      "480"  -> "-s hd480 -ab 256k -ac 2", 
+      "720"  -> "-s hd720 -ab 320k",
+      "1080" -> "-s hd1080 -ab 512k")
 
   def list(dir: String) = Action { implicit request =>
     val json = Cache.getOrElse(getCacheKey(dir, "files"), 60*5){
@@ -99,6 +106,17 @@ object Api extends Controller {
     )
     // Use this when PR617 will be merged (https://github.com/playframework/Play20/pull/617)
     Ok.sendFile(content = new java.io.File(baseDir + path), inline = true)
+  }
+
+  def stream(quality: String, path: String) = Action {
+    streamQuality.get(quality).map{ qualityArgs => 
+      val cmd = "avconv -v warning -i pipe:0 -vcodec libx264 -acodec libfaac "+qualityArgs+" -t 60 -ss 190 pipe:1"
+      println(cmd)
+      val convertVideo = CLI.pipe(cmd)
+      val stream = Enumerator.fromFile(new java.io.File(baseDir + path))
+      Ok.stream(stream &> convertVideo)
+        .withHeaders(CONTENT_TYPE -> "video/mp4")
+    }.getOrElse(BadRequest("Qualité demandée inconnue"))
   }
 
   def newFiles = Action { implicit request =>
