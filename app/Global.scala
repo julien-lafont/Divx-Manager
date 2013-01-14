@@ -15,7 +15,7 @@ object Global extends GlobalSettings {
        super.onRouteRequest(request)
      }
 
-     Identity.get(request).map(identity => 
+     Identity.get(request).map(identity =>
        super.onRouteRequest(request)
      ).getOrElse(
        super.onRouteRequest(

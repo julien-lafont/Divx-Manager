@@ -7,7 +7,6 @@ import scalax.file.ImplicitConversions._
 import scalax.file.PathSet
 import Path._
 import scalax.file.PathMatcher._
-import play.api.libs.json.Json
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.collection.JavaConversions._
@@ -18,9 +17,8 @@ import services.security.Identity
 import play.api.libs.iteratee._
 import play.api.cache.Cache
 import play.api.Play.current
-import views.html.defaultpages.badRequest
-import services.CLI
 import play.api.libs.concurrent.Execution.Implicits._
+import views.html.defaultpages.unauthorized
   
 object Api extends Controller {
 
@@ -44,18 +42,15 @@ object Api extends Controller {
     (__ \ "isFile").write[Boolean] and
     (__ \ "details").write[MyFileDetails]
   )(unlift(MyFile.unapply))
-  
+
   val baseDir = "./links"
   val moviesExtensions = Seq("avi", "wmv", "mkv", "mp4", "mpg")
-  val streamQuality = Map(
-      "480"  -> "-s hd480 -ab 256k -ac 2", 
-      "720"  -> "-s hd720 -ab 320k",
-      "1080" -> "-s hd1080 -ab 512k")
+  val timeout = 60*5
 
   def list(dir: String) = Action { implicit request =>
-    val json = Cache.getOrElse(getCacheKey(dir, "files"), 60*5){
-      val path = baseDir + dir
-      val files = path **  ("*.{" + moviesExtensions.mkString(",") + "}")
+    if (!Identity.isFolderAuthorized(dir)) Unauthorized
+    val json = Cache.getOrElse(getCacheKey(dir, "files"), timeout) {
+      val files = (baseDir + dir) **  ("*.{" + moviesExtensions.mkString(",") + "}")
       val elems = sort(files.toList.map(MyFile(_)))
       Json.toJson(elems)
     }
@@ -63,9 +58,9 @@ object Api extends Controller {
   }
 
   def listDirs(dir: String) = Action { implicit request =>
-    val json = Cache.getOrElse(getCacheKey(dir, "dirs"), 60*5){
-      val path = baseDir + dir
-      val folders = path.children(IsDirectory)
+    if (!Identity.isFolderAuthorized(dir)) Unauthorized
+    val json = Cache.getOrElse(getCacheKey(dir, "dirs"), timeout) {
+      val folders = (baseDir + dir).children(IsDirectory)
       val elems = sort(folders.toList.map(MyFile(_)))
       Json.toJson(elems)
     }
@@ -81,46 +76,23 @@ object Api extends Controller {
     Ok(Json.toJson(folders))
   }
 
-  def download(path: String) = Action {
-    val content = new java.io.File(baseDir + path)
-    SimpleResult(
-      header = ResponseHeader(OK, Map(
-        CONTENT_LENGTH -> content.length.toString,
-        CONTENT_TYPE -> play.api.libs.MimeTypes.forFileName(content.getName).getOrElse(play.api.http.ContentTypes.BINARY),
-        CONTENT_DISPOSITION -> ("""attachment; filename="%s"""".format(content.getName))
-        )),
-      Enumerator.fromFile(content)
-    )
-    // Use this when PR617 will be merged (https://github.com/playframework/Play20/pull/617)
-    //Ok.sendFile(new java.io.File(baseDir + path))
+  def rawListing(dir: String) = Action { implicit request => 
+    if (!Identity.isFolderAuthorized(dir)) Unauthorized
+    val list = Cache.getOrElse(getCacheKey(dir, "listing"), timeout) {
+      val files = (baseDir + dir) **  ("*.{" + moviesExtensions.mkString(",") + "}")
+      val links = files.toList.map(f => routes.Api.download("/"+f.relativize(Api.baseDir).path).absoluteURL(true))
+      links mkString "\n"
+    }
+    Ok(list)
   }
 
-  def open(path: String) = Action {
-    val content = new java.io.File(baseDir + path)
-    SimpleResult(
-      header = ResponseHeader(OK, Map(
-        CONTENT_LENGTH -> content.length.toString,
-        CONTENT_TYPE -> play.api.libs.MimeTypes.forFileName(content.getName).getOrElse(play.api.http.ContentTypes.BINARY)
-        )),
-      Enumerator.fromFile(content)
-    )
-    // Use this when PR617 will be merged (https://github.com/playframework/Play20/pull/617)
-    Ok.sendFile(content = new java.io.File(baseDir + path), inline = true)
-  }
-
-  def stream(quality: String, path: String) = Action {
-    streamQuality.get(quality).map{ qualityArgs => 
-      val cmd = "avconv -v warning -i pipe:0 -vcodec libx264 -acodec libfaac -threads 2 "+qualityArgs+" -t 60 -ss 190 pipe:1"
-      println(cmd)
-      val convertVideo = CLI.pipe(cmd)
-      val stream = Enumerator.fromFile(new java.io.File(baseDir + path))
-      Ok.stream(stream &> convertVideo)
-        .withHeaders(CONTENT_TYPE -> "video/mp4")
-    }.getOrElse(BadRequest("Qualité demandée inconnue"))
+  def download(path: String) = Action { implicit request => 
+    if (!Identity.isFolderAuthorized(path)) Unauthorized
+    Ok.sendFile(new java.io.File(baseDir + path))
   }
 
   def newFiles = Action { implicit request =>
-    val json = Cache.getOrElse("top10", 60*5){
+    val json = Cache.getOrElse("top10", timeout) {
       val identity = Identity.get
       val paths = identity.get.folders.map(f => baseDir + '/' + f.path);
       val files = paths.flatMap(p => p ** ("*.{" + moviesExtensions.mkString(",") + "}"))

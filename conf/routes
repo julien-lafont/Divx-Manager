@@ -11,10 +11,10 @@ GET     /api/list/folders*path      controllers.Api.listDirs(path)
 GET     /api/roots					controllers.Api.roots
 
 GET     /api/download*file          controllers.Api.download(file)
-GET     /api/open*file              controllers.Api.open(file)
-GET     /api/stream/:quality*file  controllers.Api.stream(quality, file)
 
 GET     /api/newFiles               controllers.Api.newFiles
+
+GET     /api/public/listing*path    controllers.Api.rawListing(path)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

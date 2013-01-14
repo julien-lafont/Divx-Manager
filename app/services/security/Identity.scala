@@ -37,6 +37,10 @@ object Identity {
       )  
     )
   }
+
+  def isFolderAuthorized(dir: String)(implicit request: RequestHeader): Boolean = {
+    get.map(_.folders.filter(e => dir.split("/")(1) == e.path).size > 0).getOrElse(false)
+  }
 }
 
 object Folder {

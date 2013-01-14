@@ -27,6 +27,7 @@ function loadFiles(path, success, order) {
 		_.each(files, function(file) {
 			addFile($base, file);
 		});
+		$("#api").html("<a href=\"/api/public/listing/"+path+"\">API: Listing</a>");
 		success();
 	});
 }
@@ -37,6 +38,7 @@ function loadFolders(path, success, order) {
 		_.each(files, function(file) {
 			addFile($base, file);
 		});
+		$("#api").html("");
 		success();
 	});
 }
