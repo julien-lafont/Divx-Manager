@@ -131,7 +131,7 @@ function initOpenDirAction() {
 			$("#n3").text("").removeClass('active');
 			resetOrder();
 		}, this);
-		if (type == 'TvShow') {
+		if (type == 'TvShow' || type == 'Other') {
 			load(dir, 'folders', success);
 		} else {
 			load(dir, 'files', success);
@@ -147,7 +147,7 @@ function initOpenDirAction() {
 			$("#n3").text("").removeClass('active');
 			resetOrder();
 		}, this);
-		if (type == 'TvShow') {
+		if (type == 'TvShow' || type == 'Other') {
 			load(dir, 'folders', success);
 		} else {
 			load(dir, 'files', success);

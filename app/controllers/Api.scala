@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
 import scala.math._
 import org.joda.time.format.DateTimeFormat
 import java.util.Locale
-import services.security.Identity
+import services.security._
 import play.api.libs.iteratee._
 import play.api.cache.Cache
 import play.api.Play.current
@@ -50,7 +50,11 @@ object Api extends Controller {
   def list(dir: String) = Action { implicit request =>
     if (!Identity.isFolderAuthorized(dir)) Unauthorized
     val json = Cache.getOrElse(getCacheKey(dir, "files"), timeout) {
-      val files = (baseDir + dir) **  ("*.{" + moviesExtensions.mkString(",") + "}")
+      val folderType = Identity.get.flatMap(_.folders.filter(_.path == dir.split("/")(1)).headOption).map(_.contentType)
+      val files = folderType match {
+        case Some(Other) => (baseDir + dir) **  ("*.*")
+        case _ => (baseDir + dir) **  ("*.{" + moviesExtensions.mkString(",") + "}")
+      }
       val elems = sort(files.toList.map(MyFile(_)))
       Json.toJson(elems)
     }
