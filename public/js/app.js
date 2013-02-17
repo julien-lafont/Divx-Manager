@@ -96,7 +96,9 @@ function addFile($base, e) {
 	html += "</td>";
 	
 	html += "<td>";
-	html += "<a href='http://www.allocine.fr/recherche/?q="+e.name+"' target='_blank'><img src='/assets/images/allocine.ico' height='15' width='15' /></a>&nbsp;&nbsp;";
+    if (isMovie(e)) {
+	    html += "<a href=\"http://www.allocine.fr/recherche/?q="+e.name+"\" target='_blank'><img src='/assets/images/allocine.ico' height='15' width='15' /></a>&nbsp;&nbsp;";
+    }
 
 	// Qualité
 	if (e.details.quality == "720p") html += "<span class='label label-warning'>720p</span> ";
@@ -195,4 +197,13 @@ function getIcone(file) {
 	else if (file.extension == "mov") icone = "file-mov.png";
 	else if (!file.isFile) icone = "folder.png";
 	return "<img src='/assets/images/icones/"+icone+"' alt='"+file.extension+"' /> ";
+}
+
+function isMovie(file) {
+    return  file.extension == "avi" ||
+            file.extension == "mkv" ||
+            file.extension == "mpg" ||
+            file.extension == "mp4" ||
+            file.extension == "mov" ||
+            file.extension == "wmv";
 }
