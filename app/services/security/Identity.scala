@@ -18,23 +18,41 @@ object Identity {
   val empty = new java.util.ArrayList[String]()
 
   def get(implicit request: RequestHeader): Option[Identity] = {
-    get(request.remoteAddress)
+    getBySession.orElse(getByIp).orElse(getByCode)
   }
 
-  def get(ip: String): Option[Identity] = {
+  def getByIp(implicit request: RequestHeader): Option[Identity] = {
+    val ip = request.remoteAddress
     authorizations.subKeys.filter(name => 
       authorizations.getConfig(name).map(conf =>
         conf.getStringList("ips").getOrElse(empty).toList.contains(ip)
       ).getOrElse(false))
     .headOption
-    .map(identity => 
-      Identity(
-        name = identity, 
-        folders = authorizations.getConfig(identity).get
-          .getStringList("folders").getOrElse(empty).toList
-          .map(folder => Folder(folder))
-          .flatten
-      )  
+    .map(loadIdentity(_))
+  }
+
+  def getByCode(implicit request: RequestHeader): Option[Identity] = {
+    request.getQueryString("auth").flatMap(code =>
+      authorizations.subKeys.filter(name =>
+        authorizations.getConfig(name).map(conf =>
+          conf.getString("code").map(_ == code).getOrElse(false)
+        ).getOrElse(false))
+      .headOption
+      .map(loadIdentity(_))
+    )
+  }
+
+  def getBySession(implicit request: RequestHeader): Option[Identity] = {
+    request.session.get("identity").map(loadIdentity(_))
+  }
+
+  private def loadIdentity(identity: String) = {
+    Identity(
+      name = identity,
+      folders = authorizations.getConfig(identity).get
+        .getStringList("folders").getOrElse(empty).toList
+        .map(folder => Folder(folder))
+        .flatten
     )
   }
 
