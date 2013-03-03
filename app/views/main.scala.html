@@ -23,8 +23,9 @@
 	          <div class="nav-collapse">
 	            <ul class="nav">
                 <li><a href="/">Médiathèque</a></li>
-                <li><a href="/request">Envoyer une requête</a></li>
+                <li><a href="@routes.Application.request">Envoyer une requête</a></li>
 	            </ul>
+              <div class="pull-right rss"><a href="@routes.Api.newFilesRSS"><img src="@routes.Assets.at("images/rss.png")" alt="RSS" /></a></div>
 	          </div>
 	        </div>
 	      </div>
