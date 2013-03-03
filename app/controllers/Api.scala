@@ -18,9 +18,12 @@ import play.api.libs.iteratee._
 import play.api.cache.Cache
 import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits._
-import views.html.defaultpages.unauthorized
-  
+import java.text.SimpleDateFormat
+import java.util.Date
+
 object Api extends Controller {
+
+  val dateRss = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z")
 
   implicit val myFileDetailsWriter = (
     (__ \ "quality").write[String] and
@@ -98,15 +101,45 @@ object Api extends Controller {
   def newFiles = Action { implicit request =>
     Identity.get.map { identity =>
       val json = Cache.getOrElse("top10-"+identity.name, timeout) {
-        val paths = identity.folders.map(f => baseDir + '/' + f.path);
-        val files = paths.flatMap(p => p ** ("*.{" + moviesExtensions.mkString(",") + "}"))
-        val top10 = files.sortBy(_.lastModified).reverse.take(30)
-        Json.toJson(top10.map(MyFile(_)))
+        Json.toJson(getLastFiles(identity, 25))
       }
       Ok(json)
     }.getOrElse(Forbidden)
   }
 
+  def newFilesRSS = Action { implicit request =>
+    Identity.get.map { identity =>
+      val rss = Cache.getOrElse("rss-"+identity.name, 1) {
+        wrapRSS(getLastFiles(identity, 50).map { file =>
+          <item>
+            <title>{file.name}</title>
+            <description>{file.rawName} ({file.size})</description>
+            <link>{routes.Api.download("/"+file.path).absoluteURL(true)}</link>
+            <pubDate>{dateRss.format(new Date(file.rawLastModified))}</pubDate>
+          </item>
+        })
+      }
+      Ok(rss)
+    }.getOrElse(Forbidden)
+  }
+
+  private def wrapRSS(items : List[xml.Elem]) = {
+    <rss version="2.0">
+      <channel>
+        <title>Divx Manager</title>
+        <lastBuildDate>{dateRss.format(new Date())}</lastBuildDate>
+        <link>https://pc.studio-dev.fr</link>
+        <language>fr</language>
+        {items}
+      </channel>
+    </rss>
+  }
+
+  private def getLastFiles(identity: Identity, nb: Int) = {
+    val paths = identity.folders.map(f => baseDir + '/' + f.path);
+    val files = paths.flatMap(p => p ** ("*.{" + moviesExtensions.mkString(",") + "}"))
+    files.sortBy(_.lastModified).reverse.take(nb).map(MyFile(_))
+  }
   private def sort(list: List[MyFile])(implicit request: RequestHeader) = {
     val sortColumn = request.getQueryString("column").getOrElse("name")
     val sortOrder = request.getQueryString("order").getOrElse("asc") == "asc"
