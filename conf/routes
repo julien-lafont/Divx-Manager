@@ -5,6 +5,8 @@
 # Home page
 GET     /                           controllers.Application.index
 GET     /unauthorized				controllers.Application.unauthorized
+GET     /request                    controllers.Application.request
+POST    /request                    controllers.Application.handleRequest
 
 GET     /api/list/files*path        controllers.Api.list(path)
 GET     /api/list/folders*path      controllers.Api.listDirs(path)

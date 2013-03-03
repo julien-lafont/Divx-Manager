@@ -10,7 +10,8 @@ object ApplicationBuild extends Build {
   val appDependencies = Seq(
     "com.github.scala-incubator.io" % "scala-io_2.10.0-RC1" % "0.4.1",
     "com.github.scala-incubator.io" % "scala-io-file_2.10.0-RC1" % "0.4.1",
-    "joda-time" % "joda-time" % "2.1"
+    "joda-time" % "joda-time" % "2.1",
+    "com.typesafe" %% "play-plugins-mailer" % "2.1.0"
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(

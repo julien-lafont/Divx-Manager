@@ -1,0 +1,72 @@
+@(error: Option[String] = None)(implicit flash: Flash)
+
+@main("Divx Manager - Envoyer une requête") {
+
+<h2>Le film ou la série qui vous intéresse n'est pas dans la liste ?</h2>
+<p class="well-small well">Envoyez moi son petit nom, et si je l'ai sous la main (entendre, si il est disponible sur mon
+  <abbr title="espace de partage de films de vacances entre citoyens respectueux de la loi et de l'industrie cinématographique">tracker torrent</abbr>), je le rajouterais
+  <abbr title="Bah ASAP quoi !">ASAP</abbr>.</p>
+
+<form class="form-horizontal" method="POST" action="/request">
+  <fieldset>
+
+    @error.map{ msg =>
+      <div class="alert alert-error">@msg</div>
+    }
+
+    @flash.get("success").map{ msg =>
+      <div class="alert alert-success">@msg</div>
+    }
+
+    <div class="control-group">
+      <label class="control-label" for="type">Média</label>
+      <div class="controls">
+        <select class="input-xlarge" name="type" id="type" required>
+          <option>Film</option>
+          <option>Série</option>
+          <option>Jeux</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="titre">Titre</label>
+      <div class="controls">
+        <input type="text" id="titre" name="titre" placeholder="Titre du média" class="input-xlarge"  />
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="qualite">Qualité</label>
+      <div class="controls">
+        <select class="input-xlarge" id="qualite" name="qualite" required>
+          <option>Pas de préférence</option>
+          <option>Normal (environ 700mo)</option>
+          <option>HD-Ready 720p (environ 4go)</option>
+          <option>Full-HD 1080p (Environ 8go)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="langue">Langue</label>
+      <div class="controls">
+        <select class="input-xlarge" id="langue" name="langue" required>
+          <option>Pas de préférence</option>
+          <option>FR</option>
+          <option>VostFR</option>
+          <option>VO (Je ne sais même pas pourquoi je le met celui là !)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Envoyer</button>
+      </div>
+    </div>
+
+  </fieldset>
+</form>
+
+}

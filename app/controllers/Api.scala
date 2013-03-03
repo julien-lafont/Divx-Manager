@@ -100,7 +100,7 @@ object Api extends Controller {
       val identity = Identity.get
       val paths = identity.get.folders.map(f => baseDir + '/' + f.path);
       val files = paths.flatMap(p => p ** ("*.{" + moviesExtensions.mkString(",") + "}"))
-      val top10 = files.sortBy(_.lastModified).reverse.take(20)
+      val top10 = files.sortBy(_.lastModified).reverse.take(30)
       Json.toJson(top10.map(MyFile(_)))
     }
     Ok(json)
