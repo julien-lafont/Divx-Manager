@@ -2,7 +2,7 @@
   <li class="nav-header">
     Dossiers
   </li>
-  <li ng-repeat="root in roots" auto-active-link>
-    <a ui-sref="mediatheque.folder({folder: root.dir})">{{root.name}}</a>
+  <li ng-repeat="dir in roots" auto-active-link>
+    <a ui-sref="mediatheque.folder(dir)">{{dir.name}}</a>
   </li>
 </ul>

@@ -43,32 +43,35 @@ object Api extends Controller {
     (__ \ "size").write[String] and
     (__ \ "rawSize").write[Long] and
     (__ \ "isFile").write[Boolean] and
+    (__ \ "isMovie").write[Boolean] and
     (__ \ "details").write[MyFileDetails]
   )(unlift(MyFile.unapply))
 
   val baseDir = "./links"
-  val moviesExtensions = Seq("avi", "wmv", "mkv", "mp4", "mpg", "srt")
-  val timeout = 60*5
+  val moviesExtensions = Seq("avi", "wmv", "mkv", "mp4", "mpg", "srt", "txt")
+  val timeout = 1
 
-  def list(dir: String) = Action { implicit request =>
-    if (!Identity.isFolderAuthorized(dir)) Unauthorized
-    val json = Cache.getOrElse(getCacheKey(dir, "files"), timeout) {
-      val folderType = Identity.get.flatMap(_.folders.filter(_.path == dir.split("/")(1)).headOption).map(_.contentType)
+  def list(dir: String, column: String, order: String) = Action { implicit request =>
+    val completeDir = "/" + dir
+    if (!Identity.isFolderAuthorized(completeDir)) Unauthorized
+    val json = Cache.getOrElse(getCacheKey(completeDir, "files"), timeout) {
+      val folderType = Identity.get.flatMap(_.folders.filter(_.path == completeDir.split("/")(1)).headOption).map(_.contentType)
       val files = folderType match {
-        case Some(Other) => (baseDir + dir) **  ("*.*")
-        case _ => (baseDir + dir) **  ("*.{" + moviesExtensions.mkString(",") + "}")
+        case Some(Other) => (baseDir + completeDir) **  ("*.*")
+        case _ => (baseDir + completeDir) **  ("*.{" + moviesExtensions.mkString(",") + "}")
       }
-      val elems = sort(files.toList.map(MyFile(_)))
+      val elems = sort(files.toList.map(MyFile(_)), column, order)
       Json.toJson(elems)
     }
     Ok(json)
   }
 
-  def listDirs(dir: String) = Action { implicit request =>
-    if (!Identity.isFolderAuthorized(dir)) Unauthorized
-    val json = Cache.getOrElse(getCacheKey(dir, "dirs"), timeout) {
-      val folders = (baseDir + dir).children(IsDirectory)
-      val elems = sort(folders.toList.map(MyFile(_)))
+  def listDirs(dir: String, column: String, order: String) = Action { implicit request =>
+    val completeDir = "/" + dir
+    if (!Identity.isFolderAuthorized(completeDir)) Unauthorized
+    val json = Cache.getOrElse(getCacheKey(completeDir, "dirs"), timeout) {
+      val folders = (baseDir + completeDir).children(IsDirectory)
+      val elems = sort(folders.toList.map(MyFile(_)), column, order)
       Json.toJson(elems)
     }
     Ok(json)
@@ -84,7 +87,7 @@ object Api extends Controller {
   }
 
   def rawListing(dir: String) = Action { implicit request => 
-    if (!Identity.isFolderAuthorized(dir)) Unauthorized
+    if (!Identity.isFolderAuthorized("/"+dir)) Unauthorized
     val list = Cache.getOrElse(getCacheKey(dir, "listing"), timeout) {
       val files = (baseDir + dir) **  ("*.{" + moviesExtensions.mkString(",") + "}")
       val links = files.toList.map(f => routes.Api.download("/"+f.relativize(Api.baseDir).path).absoluteURL(true))
@@ -140,9 +143,7 @@ object Api extends Controller {
     val files = paths.flatMap(p => p ** ("*.{" + moviesExtensions.mkString(",") + "}"))
     files.sortBy(_.lastModified).reverse.take(nb).map(MyFile(_))
   }
-  private def sort(list: List[MyFile])(implicit request: RequestHeader) = {
-    val sortColumn = request.getQueryString("column").getOrElse("name")
-    val sortOrder = request.getQueryString("order").getOrElse("asc") == "asc"
+  private def sort(list: List[MyFile], sortColumn: String, sortOrder: String)(implicit request: RequestHeader) = {
     val order = list.sortBy(file => sortColumn match {
       case "name" => file.name.toLowerCase
       case "season" => "%s%s".format(file.details.season, file.details.episode).trim
@@ -152,7 +153,7 @@ object Api extends Controller {
       case "year" => file.details.year
       case _ => file.name.toLowerCase
     })
-    if (sortOrder) order else order.reverse
+    if (sortOrder == "asc") order else order.reverse
   }
 
   private def getCacheKey(dir: String, what: String)(implicit req: RequestHeader) = {
@@ -162,7 +163,7 @@ object Api extends Controller {
 }
 
 case class MyFile(name: String, rawName: String, path: String, extension: String, lastModified: String, rawLastModified: Long,
-    size: String, rawSize: Long, isFile: Boolean, details: MyFileDetails)
+    size: String, rawSize: Long, isFile: Boolean, isMovie: Boolean, details: MyFileDetails)
 case class MyFileDetails(quality: String, lang: String, year: String, season: String, episode: String)
 
 object MyFile {
@@ -177,6 +178,7 @@ object MyFile {
         size      = getSize(path.size).getOrElse(""),
         rawSize   = path.size.getOrElse(-1),
         isFile    = path.isFile,
+        isMovie   = path.extension.map(fileIsMovie).getOrElse(false),
         details = MyFileDetails(
           quality   = getQuality(path.name),
           lang      = getLang(path.name),
@@ -253,6 +255,11 @@ object MyFile {
         mo + " mo"
     }
   }
+
+  private def fileIsMovie(extension: String) = {
+    List("avi", "mkv", "mpg", "mp4", "mov", "wmv").contains(extension)
+  }
+
 }
 
 object ApiRouting extends Controller {

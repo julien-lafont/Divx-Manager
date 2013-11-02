@@ -7,11 +7,11 @@ GET         /                               controllers.Application.index(angula
 GET         /unauthorized                   controllers.Application.unauthorized
 GET         /logout                         controllers.Application.logout
 GET         /rss                            controllers.Api.newFilesRSS
-GET         /routes                         controllers.ApiRouting.jsRoutes
+GET         /routes                         controllers.ApiRouting.jsRoutes()
 
 # API
-GET         /api/list/files*path            controllers.Api.list(path)
-GET         /api/list/folders*path          controllers.Api.listDirs(path)
+GET         /api/list/files/*path           controllers.Api.list(path, column: String ?= "name", order: String ?= "asc")
+GET         /api/list/folders/*path         controllers.Api.listDirs(path, column: String ?= "name", order: String ?= "asc")
 GET         /api/roots                      controllers.Api.roots
 GET         /api/download*file              controllers.Api.download(file)
 GET         /api/newFiles                   controllers.Api.newFiles

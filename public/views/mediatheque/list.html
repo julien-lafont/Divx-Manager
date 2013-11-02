@@ -1,0 +1,16 @@
+<breadcrumb directory=directory></breadcrumb>
+
+<table class="table table-striped">
+  <thead>
+    <th></th>
+    <th><a href="javascript:void(0)" ng-click="sort('name')"><sorter column="name" order="order">Nom</sorter></a>
+       (<a href="javascript:void(0)" ng-click="sort('year')"><sorter column="year" order="order">Année</sorter></a>)</th>
+    <th><a href="javascript:void(0)" ng-click="sort('season')"><sorter column="season" order="order">Saison</sorter></a></th>
+    <th><a href="javascript:void(0)" ng-click="sort('quality')"><sorter column="quality" order="order">Qualité</sorter></a></th>
+    <th><a href="javascript:void(0)" ng-click="sort('size')"><sorter column="size" order="order">Taille</sorter></a></th>
+    <th><a href="javascript:void(0)" ng-click="sort('date')"><sorter column="date" order="order">Date d'ajout</sorter></a></th>
+  </thead>
+  <tbody id="list-body">
+    <tr entry ng-repeat="entry in list"></tr>
+  </tbody>
+</table>

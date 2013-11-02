@@ -15,7 +15,7 @@ angular.module('app.global')
 
           while (i < links.length) {
             link = angular.element(links[i])
-            regex = new RegExp(link.attr('href'))
+            regex = new RegExp(decodeURI(link.attr('href')).toLowerCase(), "i")
 
             if (rawUrl.match(regex)) {
               link.addClass('active')

@@ -19,9 +19,11 @@ angular.module('app', ['ui.router', 'app.global', 'app.mediatheque'])
           }
         })
           .state('mediatheque.folder', {
-            url: '/{folder}',
-            template: 'FOLDER'
+            url: '/*dir',
+            templateUrl: '/assets/views/mediatheque/list.html',
+            controller: 'FolderController'
           })
+
         .state('new-request', {
           url: '/requête',
           template: 'TODO New-Request'
