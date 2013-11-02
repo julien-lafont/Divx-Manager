@@ -1,0 +1,8 @@
+<ul class="nav nav-list">
+  <li class="nav-header">
+    Dossiers
+  </li>
+  <li ng-repeat="root in roots" auto-active-link>
+    <a ui-sref="mediatheque.folder({folder: root.dir})">{{root.name}}</a>
+  </li>
+</ul>

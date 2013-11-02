@@ -6,9 +6,7 @@ angular.module('app.global')
       restrict: 'A',
       link: function link($scope, iElement, iAttrs, controller) {
 
-        // Set or unset the `active` class on links.
-        $scope.$on('$locationChangeSuccess', function activate(event, url) {
-
+        var checkActiveLinks = function(url) {
           var links = iElement.find('a'),
             rawUrl = decodeURI(url),
             i = 0,
@@ -17,7 +15,7 @@ angular.module('app.global')
 
           while (i < links.length) {
             link = angular.element(links[i])
-            regex = new RegExp(link.attr('href') + "$")
+            regex = new RegExp(link.attr('href'))
 
             if (rawUrl.match(regex)) {
               link.addClass('active')
@@ -29,7 +27,14 @@ angular.module('app.global')
 
             i++
           }
+        }
+
+        $scope.$on('$locationChangeSuccess', function activate(event, url) {
+          checkActiveLinks(url)
         })
+
+        // Launch at first launch
+        checkActiveLinks(window.location.href)
       }
     }
   }])

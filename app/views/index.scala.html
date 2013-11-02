@@ -16,32 +16,7 @@
 
     <navbar></navbar>
 
-    <div class="container-fluid">
-      <div class="row-fluid">
-        <div class="span3">
-          <div class="well sidebar-nav">
-            <ul class="nav nav-list" id="folders-menu">
-              <li class="nav-header">
-                Dossiers
-              </li>
-            </ul>
-          </div>
-
-          <div class="well sidebar-nav">
-            <ul class="nav nav-list" id="last-menu">
-              <li class="nav-header">
-                Derniers ajouts
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="span9">
-
-          <div ui-view></div>
-
-        </div>
-      </div>
-    </div>
+    <div ui-view></div>
 
   </body>
 
@@ -50,12 +25,17 @@
   <script src="@routes.Assets.at("bower_components/jquery/jquery.min.js")"></script>
   <script src="@routes.Assets.at("bower_components/underscore/underscore-min.js")"></script>
   <script src="@routes.Assets.at("bower_components/bootstrap-css/js/bootstrap.min.js")"></script>
+  <script src="@routes.ApiRouting.jsRoutes"></script>
 
-  <script src="@controllers.routes.Assets.at("javascripts/app.js")"></script>
-  <script src="@controllers.routes.Assets.at("javascripts/modules.js")"></script>
-  <script src="@controllers.routes.Assets.at("javascripts/mediatheque/controller.js")"></script>
+  <script src="@routes.Assets.at("javascripts/app.js")"></script>
+  <script src="@routes.Assets.at("javascripts/modules.js")"></script>
 
-  <script src="@controllers.routes.Assets.at("javascripts/global/directives/navbar.js")"></script>
-  <script src="@controllers.routes.Assets.at("javascripts/global/directives/auto-active-link.js")"></script>
+  <script src="@routes.Assets.at("javascripts/mediatheque/controller.js")"></script>
+  <script src="@routes.Assets.at("javascripts/mediatheque/directives/root-folders.js")"></script>
+  <script src="@routes.Assets.at("javascripts/mediatheque/services/mediatheque.js")"></script>
+
+  <script src="@routes.Assets.at("javascripts/global/directives/navbar.js")"></script>
+  <script src="@routes.Assets.at("javascripts/global/directives/auto-active-link.js")"></script>
+  <script src="@routes.Assets.at("javascripts/global/services/utils.js")"></script>
 
 </html>

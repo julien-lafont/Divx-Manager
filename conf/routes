@@ -7,6 +7,7 @@ GET         /                               controllers.Application.index(angula
 GET         /unauthorized                   controllers.Application.unauthorized
 GET         /logout                         controllers.Application.logout
 GET         /rss                            controllers.Api.newFilesRSS
+GET         /routes                         controllers.ApiRouting.jsRoutes
 
 # API
 GET         /api/list/files*path            controllers.Api.list(path)

@@ -6,18 +6,23 @@ angular.module('app', ['ui.router', 'app.global', 'app.mediatheque'])
 
       $locationProvider.html5Mode(true);
 
-      $router.otherwise('/')
+      $router.otherwise('/mediatheque')
 
       $state
         .state('mediatheque', {
-          url: '/',
-          //templateUrl: '/assets/views/quoi.html',
+          url: '/mediatheque',
+          templateUrl: '/assets/views/mediatheque/main.html',
           controller: 'MediathequeController',
-          template: 'TODO Mediathèque'
+          resolve: { roots: ['mediathequeService', function(svc) { return svc.roots() }]}
         })
+          .state('mediatheque.folder', {
+            url: '/{folder}',
+            template: 'FOLDER'
+          })
         .state('new-request', {
           url: '/requête',
           template: 'TODO New-Request'
         })
 
-    }])
+    }]
+  )
