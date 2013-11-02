@@ -9,8 +9,13 @@ angular.module('app.mediatheque')
       return $http(root.roots()).then(q.data)
     }
 
+    var lastEntries = function() {
+     return $http(root.newFiles()).then(q.data)
+    }
+
     return {
-      roots: roots
+      roots: roots,
+      lastEntries: lastEntries
     }
 
   }])

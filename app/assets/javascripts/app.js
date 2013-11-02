@@ -13,7 +13,10 @@ angular.module('app', ['ui.router', 'app.global', 'app.mediatheque'])
           url: '/mediatheque',
           templateUrl: '/assets/views/mediatheque/main.html',
           controller: 'MediathequeController',
-          resolve: { roots: ['mediathequeService', function(svc) { return svc.roots() }]}
+          resolve: {
+            roots: ['mediathequeService', function(svc) { return svc.roots() }],
+            lastEntries: ['mediathequeService', function(svc) { return svc.lastEntries() }]
+          }
         })
           .state('mediatheque.folder', {
             url: '/{folder}',

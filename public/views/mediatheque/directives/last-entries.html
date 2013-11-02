@@ -1,0 +1,10 @@
+<ul class="nav nav-list">
+  <li class="nav-header">
+    Derniers ajouts
+  </li>
+  <li ng-repeat="entry in lastEntries">
+    <a href="/api/download/{{entry.path}}" title="{{entry.name}}" target="_self">
+      <img src="{{entry | fileicon}}" alt="{{entry.extension}}" />
+      {{entry.name}}</a>
+  </li>
+</ul>

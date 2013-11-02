@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('app.global')
+angular.module('app.mediatheque')
   .directive('rootFolders', [function factory() {
     return {
       restrict: 'E',
