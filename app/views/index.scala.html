@@ -8,11 +8,40 @@
 
     <link rel="stylesheet" type="text/css" href="@routes.Assets.at("bower_components/bootstrap-css/css/bootstrap.min.css")" />
     <link rel="stylesheet" type="text/css" href="@routes.Assets.at("css/main.css")" />
+
     <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")" />
+    <link rel="alternate" type="application/rss+xml" title="Flux RSS" href="/rss"/>
   </head>
   <body ng-app="app">
 
-    <div ui-view></div>
+    <navbar></navbar>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list" id="folders-menu">
+              <li class="nav-header">
+                Dossiers
+              </li>
+            </ul>
+          </div>
+
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list" id="last-menu">
+              <li class="nav-header">
+                Derniers ajouts
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="span9">
+
+          <div ui-view></div>
+
+        </div>
+      </div>
+    </div>
 
   </body>
 
@@ -25,5 +54,8 @@
   <script src="@controllers.routes.Assets.at("javascripts/app.js")"></script>
   <script src="@controllers.routes.Assets.at("javascripts/modules.js")"></script>
   <script src="@controllers.routes.Assets.at("javascripts/mediatheque/controller.js")"></script>
+
+  <script src="@controllers.routes.Assets.at("javascripts/global/directives/navbar.js")"></script>
+  <script src="@controllers.routes.Assets.at("javascripts/global/directives/auto-active-link.js")"></script>
 
 </html>

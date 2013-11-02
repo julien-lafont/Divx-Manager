@@ -7,7 +7,8 @@ import services.security.Identity
 object Global extends GlobalSettings {
 
   val noAuthPaths = Seq(
-      "/unauthorized"
+    "/unauthorized",
+    "/logout"
   )
 
   override def onRouteRequest(request: RequestHeader): Option[Handler] = {

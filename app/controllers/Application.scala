@@ -10,13 +10,17 @@ import play.api.Play.current
 
 object Application extends Controller {
 
-  def index(angularUri: String) = Action { implicit request =>
+  def index(angularUri: String = "") = Action { implicit request =>
     Ok(views.html.index.render())
       .withSession("identity" -> Identity.get.map(_.name).get)
   }
 
   def unauthorized() = Action { request =>
     Unauthorized(s"Ce lieu de connexion n'a pas été autorisé. \nIP : ${request.remoteAddress}")
+  }
+
+  def logout() = Action { request =>
+    Redirect("/").withNewSession
   }
 
   case class MediaRequest(media: String, titre: String, langue: String, qualite: String)

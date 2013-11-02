@@ -5,6 +5,7 @@
 # Home page
 GET         /                               controllers.Application.index(angularUri ?= "index")
 GET         /unauthorized                   controllers.Application.unauthorized
+GET         /logout                         controllers.Application.logout
 GET         /rss                            controllers.Api.newFilesRSS
 
 # API
