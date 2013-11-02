@@ -10,20 +10,21 @@ import play.api.Play.current
 
 object Application extends Controller {
 
-  def index() = Action { implicit request =>
+  def index(angularUri: String) = Action { implicit request =>
     Ok(views.html.index.render())
       .withSession("identity" -> Identity.get.map(_.name).get)
   }
 
   def unauthorized() = Action { request =>
-    Unauthorized("Ce lieu de connexion n'a pas été autorisé. \nIP : %s" format(request.remoteAddress))
-  }
-
-  def request() = Action { implicit request =>
-    Ok(views.html.request())
+    Unauthorized(s"Ce lieu de connexion n'a pas été autorisé. \nIP : ${request.remoteAddress}")
   }
 
   case class MediaRequest(media: String, titre: String, langue: String, qualite: String)
+
+  /*def request() = Action { implicit request =>
+    //Ok(views.html.request())
+  }
+
 
   def handleRequest() = Action { implicit request =>
     val requestForm = Form(mapping("type" -> nonEmptyText, "titre" -> nonEmptyText, "langue" -> nonEmptyText, "qualite" -> nonEmptyText)(MediaRequest.apply)(MediaRequest.unapply))
@@ -35,7 +36,7 @@ object Application extends Controller {
         Redirect(routes.Application.request).flashing("success" -> "Votre requête a été envoyée !")
       }
     )
-  }
+  }*/
 
   private def sendRequestMail(req: MediaRequest)(implicit httpRequest: RequestHeader) = {
     val identity = Identity.get.get

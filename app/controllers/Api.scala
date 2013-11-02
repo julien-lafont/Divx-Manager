@@ -254,9 +254,3 @@ object MyFile {
     }
   }
 }
-
-object MyFileJson {
-
-  
-
-}
