@@ -57,7 +57,7 @@ function loadTop10() {
 	$.get("/api/newFiles", function(files) {
 		var $base = $("#last-menu");
 		_.each(files, function(file) {
-			$base.append("<li><a href='/api/download/"+file.path+"' title='"+file.rawName+"'>"+getIcone(file)+" "+file.name+"</a></li>");
+			$base.append("<li><a href=\"/api/download/"+file.path+"\" title=\""+file.rawName+"\">"+getIcone(file)+" "+file.name+"</a></li>");
 		});
 	});
 }

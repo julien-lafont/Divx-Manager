@@ -47,7 +47,7 @@ object Api extends Controller {
   )(unlift(MyFile.unapply))
 
   val baseDir = "./links"
-  val moviesExtensions = Seq("avi", "wmv", "mkv", "mp4", "mpg")
+  val moviesExtensions = Seq("avi", "wmv", "mkv", "mp4", "mpg", "srt")
   val timeout = 60*5
 
   def list(dir: String) = Action { implicit request =>
