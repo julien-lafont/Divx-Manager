@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('app', ['ui.router', 'app.global', 'app.mediatheque'])
+angular.module('app', ['ui.router', 'app.global', 'app.mediatheque', 'app.request'])
   .config(
     ['$stateProvider', '$urlRouterProvider', '$locationProvider', function($state, $router, $locationProvider) {
 
@@ -26,7 +26,8 @@ angular.module('app', ['ui.router', 'app.global', 'app.mediatheque'])
 
         .state('new-request', {
           url: '/requête',
-          template: 'TODO New-Request'
+          templateUrl: '/assets/views/request/new.html',
+          controller: 'RequestController'
         })
 
     }]

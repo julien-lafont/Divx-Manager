@@ -7,7 +7,10 @@ GET         /                               controllers.Application.index(angula
 GET         /unauthorized                   controllers.Application.unauthorized
 GET         /logout                         controllers.Application.logout
 GET         /rss                            controllers.Api.newFilesRSS
-GET         /routes                         controllers.ApiRouting.jsRoutes()
+GET         /routes                         controllers.AppRouting.jsRoutes()
+
+# Request
+POST        /request                        controllers.Request.post
 
 # API
 GET         /api/list/files/*path           controllers.Api.list(path, column: String ?= "name", order: String ?= "asc")

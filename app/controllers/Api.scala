@@ -261,20 +261,3 @@ object MyFile {
   }
 
 }
-
-object ApiRouting extends Controller {
-
-  def jsRoutes() = Action { implicit request =>
-    Ok(
-      Routes.javascriptRouter("jsRoutes")(
-        routes.javascript.Api.list,
-        routes.javascript.Api.listDirs,
-        routes.javascript.Api.roots,
-        routes.javascript.Api.rawListing,
-        routes.javascript.Api.download,
-        routes.javascript.Api.newFiles
-      )
-    ).as(JAVASCRIPT)
-  }
-
-}
