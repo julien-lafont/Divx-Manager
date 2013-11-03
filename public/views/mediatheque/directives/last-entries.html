@@ -4,7 +4,7 @@
   </li>
   <li ng-repeat="entry in lastEntries">
     <a href="/api/download/{{entry.path}}" title="{{entry.name}}" target="_self">
-      <img src="{{entry | fileicon}}" alt="{{entry.extension}}" />
+      <img ng-src="{{entry | fileicon}}" alt="{{entry.extension}}" />
       {{entry.name}}</a>
   </li>
 </ul>

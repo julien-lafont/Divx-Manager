@@ -20,6 +20,7 @@ import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits._
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.net.URLDecoder
 
 object Api extends Controller {
 
@@ -52,14 +53,16 @@ object Api extends Controller {
   val timeout = 60*5
 
   def list(dir: String, column: String, order: String) = Action { implicit request =>
-    val completeDir = "/" + dir
+    val completeDir = "/" + URLDecoder.decode(dir, "UTF-8")
     if (!Identity.isFolderAuthorized(completeDir)) Unauthorized
     val json = Cache.getOrElse(getCacheKey(completeDir, "files"), timeout) {
       val folderType = Identity.get.flatMap(_.folders.filter(_.path == completeDir.split("/")(1)).headOption).map(_.contentType)
+
       val files = folderType match {
         case Some(Other) => (baseDir + completeDir) **  ("*.*")
         case _ => (baseDir + completeDir) **  ("*.{" + moviesExtensions.mkString(",") + "}")
       }
+
       val elems = sort(files.toList.map(MyFile(_)), column, order)
       Json.toJson(elems)
     }
@@ -67,7 +70,7 @@ object Api extends Controller {
   }
 
   def listDirs(dir: String, column: String, order: String) = Action { implicit request =>
-    val completeDir = "/" + dir
+    val completeDir = "/" + URLDecoder.decode(dir, "UTF-8")
     if (!Identity.isFolderAuthorized(completeDir)) Unauthorized
     val json = Cache.getOrElse(getCacheKey(completeDir, "dirs"), timeout) {
       val folders = (baseDir + completeDir).children(IsDirectory)
@@ -86,10 +89,11 @@ object Api extends Controller {
     Ok(Json.toJson(folders))
   }
 
-  def rawListing(dir: String) = Action { implicit request => 
-    if (!Identity.isFolderAuthorized("/"+dir)) Unauthorized
-    val list = Cache.getOrElse(getCacheKey(dir, "listing"), timeout) {
-      val files = (baseDir + dir) **  ("*.{" + moviesExtensions.mkString(",") + "}")
+  def rawListing(dir: String) = Action { implicit request =>
+    val completeDir = "/" + URLDecoder.decode(dir, "UTF-8")
+    if (!Identity.isFolderAuthorized(completeDir)) Unauthorized
+    val list = Cache.getOrElse(getCacheKey(completeDir, "listing"), timeout) {
+      val files = (baseDir + completeDir) **  ("*.{" + moviesExtensions.mkString(",") + "}")
       val links = files.toList.map(f => routes.Api.download("/"+f.relativize(Api.baseDir).path).absoluteURL(true))
       links mkString "\n"
     }
