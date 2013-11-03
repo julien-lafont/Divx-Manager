@@ -29,7 +29,7 @@ angular.module('app.mediatheque')
     }
 
     var movieDetail = function(name) {
-      return $http(jsRoutes.controllers.Movie.detail(name)).then(q.data)
+      return $http(jsRoutes.controllers.Movie.detail(name))
     }
 
     return {
