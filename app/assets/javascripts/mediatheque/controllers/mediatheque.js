@@ -13,7 +13,7 @@ angular.module('app.mediatheque')
       }
 
       $scope.getRootEntry = function(dir) {
-        return _.find(function(e) { return e.dir === dir })
+        return _.find($scope.roots, function(e) { return e.dir === dir })
       }
 
     }]
