@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.net.URLDecoder
 
-object Api extends Controller {
+object Api extends Controller with SecuredController {
 
   val dateRss = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z")
 
@@ -52,7 +52,7 @@ object Api extends Controller {
   val moviesExtensions = Seq("avi", "wmv", "mkv", "mp4", "mpg", "srt")
   val timeout = 60*5
 
-  def list(dir: String, column: String, order: String) = Action { implicit request =>
+  def list(dir: String, column: String, order: String) = Secured { implicit request =>
     val completeDir = "/" + URLDecoder.decode(dir, "UTF-8")
     if (!Identity.isFolderAuthorized(completeDir)) Unauthorized
     val json = Cache.getOrElse(getCacheKey(completeDir, "files"), timeout) {
@@ -69,7 +69,7 @@ object Api extends Controller {
     Ok(json)
   }
 
-  def listDirs(dir: String, column: String, order: String) = Action { implicit request =>
+  def listDirs(dir: String, column: String, order: String) = Secured { implicit request =>
     val completeDir = "/" + URLDecoder.decode(dir, "UTF-8")
     if (!Identity.isFolderAuthorized(completeDir)) Unauthorized
     val json = Cache.getOrElse(getCacheKey(completeDir, "dirs"), timeout) {
@@ -80,16 +80,15 @@ object Api extends Controller {
     Ok(json)
   }
 
-  def roots = Action { implicit request =>
-    val identity = Identity.get
-    val folders = identity.get.folders.map(f => Map(
+  def roots = Secured { implicit request =>
+    val folders = request.user.folders.map(f => Map(
         "dir" -> f.path, 
         "name" -> f.name, 
         "type" -> f.contentType.toString()))
     Ok(Json.toJson(folders))
   }
 
-  def rawListing(dir: String) = Action { implicit request =>
+  def rawListing(dir: String) = Secured { implicit request =>
     val completeDir = "/" + URLDecoder.decode(dir, "UTF-8")
     if (!Identity.isFolderAuthorized(completeDir)) Unauthorized
     val list = Cache.getOrElse(getCacheKey(completeDir, "listing"), timeout) {
@@ -100,34 +99,30 @@ object Api extends Controller {
     Ok(list)
   }
 
-  def download(path: String) = Action { implicit request => 
+  def download(path: String) = Secured { implicit request =>
     if (!Identity.isFolderAuthorized(path)) Unauthorized
     Ok.sendFile(new java.io.File(baseDir + URLDecoder.decode(path, "UTF-8")))
   }
 
-  def newFiles = Action { implicit request =>
-    Identity.get.map { identity =>
-      val json = Cache.getOrElse("top10-"+identity.name, timeout) {
-        Json.toJson(getLastFiles(identity, 25))
-      }
-      Ok(json)
-    }.getOrElse(Forbidden)
+  def newFiles = Secured { implicit request =>
+    val json = Cache.getOrElse("top10-" + request.user.name, timeout) {
+      Json.toJson(getLastFiles(request.user, 25))
+    }
+    Ok(json)
   }
 
-  def newFilesRSS = Action { implicit request =>
-    Identity.get.map { identity =>
-      val rss = Cache.getOrElse("rss-"+identity.name, 1) {
-        wrapRSS(getLastFiles(identity, 50).map { file =>
-          <item>
-            <title>{file.name}</title>
-            <description>{file.rawName} ({file.size})</description>
-            <link>{routes.Api.download("/"+file.path).absoluteURL(true)}</link>
-            <pubDate>{dateRss.format(new Date(file.rawLastModified))}</pubDate>
-          </item>
-        })
-      }
-      Ok(rss)
-    }.getOrElse(Forbidden)
+  def newFilesRSS = Secured { implicit request =>
+    val rss = Cache.getOrElse("rss-" + request.user.name, 1) {
+      wrapRSS(getLastFiles(request.user, 50).map { file =>
+        <item>
+          <title>{file.name}</title>
+          <description>{file.rawName} ({file.size})</description>
+          <link>{routes.Api.download("/"+file.path).absoluteURL(true)}</link>
+          <pubDate>{dateRss.format(new Date(file.rawLastModified))}</pubDate>
+        </item>
+      })
+    }
+    Ok(rss)
   }
 
   private def wrapRSS(items : List[xml.Elem]) = {
