@@ -2,7 +2,8 @@
 
 angular.module('app.mediatheque')
   .controller('MediathequeController',
-    ['$scope', '$state', '$stateParams', 'roots', 'lastEntries', function($scope, $state, $params, roots, lastEntries) {
+    ['$scope', '$state', '$stateParams', 'mediathequeService', 'roots', 'lastEntries',
+      function($scope, $state, $params, mediathequeService, roots, lastEntries) {
 
       $scope.roots = roots
       $scope.lastEntries = lastEntries
@@ -16,6 +17,24 @@ angular.module('app.mediatheque')
         return _.find($scope.roots, function(e) { return e.dir === dir })
       }
 
+      $('#movieModal').modal()
+
+      $scope.detail = function(entry) {
+
+        $scope.modalLoading = true
+        $('#movieModal').modal('show')
+
+        mediathequeService.movieDetail(entry.name)
+          .success(function(data) {
+            $scope.movie = data
+            $scope.selectedEntry = entry
+            $scope.modalLoading = false
+          })
+          .error(function(data) {
+            $scope.movie = null
+            $scope.modalLoading = false
+          })
+      }
     }]
   )
 

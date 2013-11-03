@@ -54,14 +54,14 @@ object MovieDBSpec extends Specification {
 
   "MovieDB detail WS" should {
     "return the french description of a movie when available" in new WithApplication {
-      val result = await(MovieDB.searchFilm(name))
+      val result = await(MovieDB.findMovieDetail(name))
       result.id === 81
       result.overview.get must contain("guerre")
       result.genres.map(_.name) must contain("Action")
     }
 
     "throw a `NoResultException` if the film is not found" in new WithApplication {
-      await(MovieDB.searchFilm("Hey I'm an awesome movie")) must throwA[MovieDbNoResultException]
+      await(MovieDB.findMovieDetail("Hey I'm an awesome movie")) must throwA[MovieDbNoResultException]
     }
   }
 }

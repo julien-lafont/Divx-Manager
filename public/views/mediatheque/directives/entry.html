@@ -3,8 +3,12 @@
 
 <!-- Name-->
 <td ng-if="entry.isFile">
-  <a href="/api/download/{{entry.path}}" title="{{entry.rawName}}" target="_self">{{entry.name}}</a>
+  <a href="javascript:void(0)" ng-click="detail(entry)" title="Informations sur le film">{{entry.name}}</a>
   <span ng-if="entry.details.year">(<strong>{{entry.details.year}}</strong>)</span>
+
+  <a href="/api/download/{{entry.path}}" target="_self" title="Télécharger {{entry.name}}">
+    <img src="/assets/images/download.png" />
+  </a>
 </td>
 <td ng-if="!entry.isFile">
   <a ui-sref="mediatheque.folder({dir: entry.path})" title="{{entry.rawName}}">{{entry.name}}</a>

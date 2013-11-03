@@ -67,7 +67,7 @@ object MovieDB extends MovieDBWs {
   /**
    * Search a movie with the best translation as possible
    */
-  def searchFilm(name: String): Future[MovieDbDetail] = {
+  def findMovieDetail(name: String): Future[MovieDbDetail] = {
     for {
       result <- searchMovieBestResult(name)
       translations <- translationsMovie(result.id)

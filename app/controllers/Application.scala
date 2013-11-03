@@ -33,7 +33,8 @@ object AppRouting extends Controller {
         routes.javascript.Api.rawListing,
         routes.javascript.Api.download,
         routes.javascript.Api.newFiles,
-        routes.javascript.Request.post
+        routes.javascript.Request.post,
+        routes.javascript.Movie.detail
       )
     ).as(JAVASCRIPT)
   }

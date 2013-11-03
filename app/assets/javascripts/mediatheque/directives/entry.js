@@ -1,7 +1,7 @@
 'use strict'
 
 angular.module('app.mediatheque')
-  .directive('entry', [function factory() {
+  .directive('entry', ['mediathequeService', function factory(mediathequeService) {
     return {
       restrict: 'EA',
       templateUrl: '/assets/views/mediatheque/directives/entry.html'

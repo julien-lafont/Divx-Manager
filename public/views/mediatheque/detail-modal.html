@@ -1,0 +1,64 @@
+<div id="movieModal" class="modal hide fade" tabindex="-1" role="dialog"  style="width: 700px; margin-left: -350px;">
+  <div ng-if="modalLoading">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h4></h4>
+    </div>
+    <div class="modal-body">
+      <p>Recherche des informations sur le film en cours...</p>
+    </div>
+  </div>
+  <div ng-if="!modalLoading">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h4 ng-if="movie">{{movie.title}}</h4>
+      <h4 ng-if="!movie">Oups...</h4>
+    </div>
+    <div class="modal-body" ng-if="movie">
+      <h5 ng-if="movie.tagline" style="margin-top: 0">{{movie.tagline}}</h5>
+
+      <div class="row-fluid">
+        <div class="span3 text-center">
+          <p><a href="{{movie.poster_xl}}" target="_blank"><img ng-src="{{movie.poster_s}}" alt="poster" class="img-polaroid" /></a></p>
+          <p>
+            <a href="/api/download/{{selectedEntry.path}}" class="btn btn-primary btn" target="_self"><i class="icon-download-alt icon-white"></i></a>
+            <a href="http://www.imdb.com/title/{{movie.imdb_id}}" target="_blank" class="btn btn-small">Fiche IMDB</a>
+          </p>
+        </div>
+
+        <div class="span9">
+          <blockquote>{{movie.overview}}</blockquote>
+        </div>
+      </div>
+
+      <p ng-if="movie.original_title">
+        <strong>Titre original : </strong> {{movie.original_title}}
+      </p>
+
+      <p>
+        <strong>Sortie : </strong> {{movie.release_date}}
+      </p>
+
+      <p>
+        <strong>Popularité :</strong> {{movie.vote_average}} / 10 ({{movie.vote_count}} votes)
+      </p>
+
+      <p>
+        <strong>Genres :</strong>
+      <span ng-repeat="genre in movie.genres">
+        <span class="label label-info">{{genre.name}}</span>&nbsp;
+      </span>
+      </p>
+    </div>
+
+    <div class="modal-body" ng-if="!movie">
+      <div class="alert alert-error">
+        Impossible de récupérer les informations de ce film
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Fermer</button>
+  </div>
+</div>

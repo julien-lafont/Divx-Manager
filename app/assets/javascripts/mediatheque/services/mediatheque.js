@@ -28,12 +28,17 @@ angular.module('app.mediatheque')
         return listFiles(root.dir, order)
     }
 
+    var movieDetail = function(name) {
+      return $http(jsRoutes.controllers.Movie.detail(name)).then(q.data)
+    }
+
     return {
       roots: roots,
       lastEntries: lastEntries,
       listFiles: listFiles,
       listDirs: listDirs,
-      fetchEntries: fetchEntries
+      fetchEntries: fetchEntries,
+      movieDetail: movieDetail
     }
 
   }])
