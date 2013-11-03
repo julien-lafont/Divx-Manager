@@ -4,7 +4,7 @@
 <!-- Name-->
 <td ng-if="entry.isFile">
   <a href="/api/download/{{entry.path}}" title="{{entry.rawName}}" target="_self">{{entry.name}}</a>
-  <span ng-if="entry.details.year">(<strong>{{entry.details.year</strong></span>
+  <span ng-if="entry.details.year">(<strong>{{entry.details.year}}</strong>)</span>
 </td>
 <td ng-if="!entry.isFile">
   <a ui-sref="mediatheque.folder({dir: entry.path})" title="{{entry.rawName}}">{{entry.name}}</a>
