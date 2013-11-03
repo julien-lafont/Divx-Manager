@@ -102,7 +102,7 @@ object Api extends Controller {
 
   def download(path: String) = Action { implicit request => 
     if (!Identity.isFolderAuthorized(path)) Unauthorized
-    Ok.sendFile(new java.io.File(baseDir + path))
+    Ok.sendFile(new java.io.File(baseDir + URLDecoder.decode(path, "UTF-8")))
   }
 
   def newFiles = Action { implicit request =>
