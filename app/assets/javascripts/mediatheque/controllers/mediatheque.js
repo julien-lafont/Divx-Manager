@@ -36,5 +36,26 @@ angular.module('app.mediatheque')
           })
       }
     }]
-  )
+  ).filter('filterMovies', function() {
+    return function(input, squery) {
+      var textsearch = (squery || '').toUpperCase().split(' ')
+      var i, s, found, out = []
+      for (i in input) {
+        found = 0
 
+        for (s in textsearch) {
+          var term = input[i].name
+          if (input[i].details && input[i].details.quality) term += " " + input[i].details.quality
+          if (input[i].details && input[i].details.year) term += " " + input[i].details.year
+          if (term.toUpperCase().indexOf(textsearch[s]) !== -1) {
+            found += 1
+          }
+        }
+
+        if (found == textsearch.length) {
+          out.push(input[i])
+        }
+      }
+      return out;
+    }
+  })

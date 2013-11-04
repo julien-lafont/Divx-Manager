@@ -1,4 +1,11 @@
-<breadcrumb directory=directory></breadcrumb>
+<div class="row-fluid">
+  <div class="span9">
+    <breadcrumb directory=directory></breadcrumb>
+  </div>
+  <div class="span3">
+    <input type="search" id="search" class="input-medium search-query" ng-model="searchquery" placeholder="Nom du film, année...">
+  </div>
+</div>
 
 <div ng-include="'/assets/views/mediatheque/news/news1.html'"></div>
 
@@ -13,7 +20,7 @@
     <th><a href="javascript:void(0)" ng-click="sort('date')"><sorter column="date" order="order">Date d'ajout</sorter></a></th>
   </thead>
   <tbody id="list-body">
-    <tr entry ng-repeat="entry in list"></tr>
+    <tr entry ng-repeat="entry in list | filterMovies:searchquery"></tr>
   </tbody>
 </table>
 
