@@ -1,8 +1,9 @@
-<ul class="nav nav-list">
+<ul class="nav nav-list" auto-active-link>
   <li class="nav-header">
-    Dossiers
+    Médiathèque
   </li>
-  <li ng-repeat="dir in roots" auto-active-link>
+  <li><a ui-sref="mediatheque.news">Nouveautés</a></li>
+  <li ng-repeat="dir in roots">
     <a ui-sref="mediatheque.folder(dir)">{{dir.name}}</a>
   </li>
 </ul>

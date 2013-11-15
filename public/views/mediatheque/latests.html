@@ -1,0 +1,27 @@
+<div class="row-fluid">
+  <div class="span9">
+    <breadcrumb raw="Nouveautés"></breadcrumb>
+  </div>
+  <div class="span3">
+    <input type="search" id="search" class="input-medium search-query" ng-model="searchquery" placeholder="Nom du film, année...">
+  </div>
+</div>
+
+<!--<div ng-include="'/assets/views/mediatheque/news/news2.html'"></div>-->
+
+<table class="table table-striped">
+  <thead>
+    <th></th>
+    <th>Nom (Année)</th>
+    <th>Saison</th>
+    <th>Qualité</th>
+    <th>Taille</a></th>
+    <th>Date d'ajout</th>
+  </thead>
+  <tbody id="list-body">
+    <tr entry ng-repeat="entry in lastEntries | filterMovies: searchquery" mixte="true" item="entry"></tr>
+  </tbody>
+</table>
+
+<!-- Movie modal -->
+<div ng-include="'/assets/views/mediatheque/detail-modal.html'"></div>

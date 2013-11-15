@@ -18,11 +18,20 @@ angular.module('app', ['ui.router', 'app.global', 'app.mediatheque', 'app.reques
             lastEntries: ['mediathequeService', function(svc) { return svc.lastEntries() }]
           }
         })
+          .state('mediatheque.news', {
+            url: '/nouveautés',
+            templateUrl: '/assets/views/mediatheque/latests.html',
+            controller: 'LatestsController',
+            resolve: {
+              lastEntries: ['mediathequeService', function(svc) { return svc.lastEntries() }]
+            }
+          })
           .state('mediatheque.folder', {
             url: '/*dir',
             templateUrl: '/assets/views/mediatheque/list.html',
             controller: 'FolderController'
           })
+          
 
         .state('new-request', {
           url: '/requête',

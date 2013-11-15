@@ -8,9 +8,9 @@ angular.module('app.mediatheque')
       $scope.roots = roots
       $scope.lastEntries = lastEntries
 
-      // Open first folder by default
+      // Open 'latests' view by default
       if (roots.length && $state.current.name === "mediatheque") {
-        $state.go("mediatheque.folder", roots[0])
+        $state.go("mediatheque.news")
       }
 
       $scope.getRootEntry = function(dir) {

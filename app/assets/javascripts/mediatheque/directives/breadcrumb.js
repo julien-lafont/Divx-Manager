@@ -5,19 +5,22 @@ angular.module('app.mediatheque')
     return {
       restrict: 'E',
       scope: {
-        'directory': '='
+        'directory': '=',
+        'raw': '@'
       },
       templateUrl: '/assets/views/mediatheque/directives/breadcrumb.html',
       link: function($scope) {
-        var parts = $scope.directory.split("/")
-        $scope.parts = []
+        if (!$scope.raw) {
+          var parts = $scope.directory.split("/")
+          $scope.parts = []
 
-        for (var i = 0; i < parts.length; i++) {
-          $scope.parts.push({
-            name: parts[i],
-            dir: ($scope.parts[i-1] ? ($scope.parts[i-1].dir + "/") : "") + parts[i],
-            isLast: i == (parts.length -1 )
-          })
+          for (var i = 0; i < parts.length; i++) {
+            $scope.parts.push({
+              name: parts[i],
+              dir: ($scope.parts[i-1] ? ($scope.parts[i-1].dir + "/") : "") + parts[i],
+              isLast: i == (parts.length -1 )
+            })
+          }
         }
       }
     }

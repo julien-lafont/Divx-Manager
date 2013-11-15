@@ -45,6 +45,8 @@ object Api extends Controller with SecuredController {
     (__ \ "rawSize").write[Long] and
     (__ \ "isFile").write[Boolean] and
     (__ \ "isMovie").write[Boolean] and
+    (__ \ "serieName").writeNullable[String] and
+    (__ \ "folderType").write[String] and
     (__ \ "details").write[MyFileDetails]
   )(unlift(MyFile.unapply))
 
@@ -56,14 +58,14 @@ object Api extends Controller with SecuredController {
     val completeDir = "/" + URLDecoder.decode(dir, "UTF-8")
     if (!Identity.isFolderAuthorized(completeDir)) Unauthorized
     val json = Cache.getOrElse(getCacheKey(completeDir, "files"), timeout) {
-      val folderType = Identity.get.flatMap(_.folders.filter(_.path == completeDir.split("/")(1)).headOption).map(_.contentType)
+      val folderType = Identity.get.flatMap(_.folders.filter(_.path == completeDir.split("/")(1)).headOption).map(_.contentType).get
 
       val files = folderType match {
-        case Some(Other) => (baseDir + completeDir) **  ("*.*")
+        case Other => (baseDir + completeDir) **  ("*.*")
         case _ => (baseDir + completeDir) **  ("*.{" + moviesExtensions.mkString(",") + "}")
       }
 
-      val elems = sort(files.toList.map(MyFile(_)), column, order)
+      val elems = sort(files.toList.map(MyFile(_, folderType)), column, order)
       Json.toJson(elems)
     }
     Ok(json)
@@ -74,7 +76,7 @@ object Api extends Controller with SecuredController {
     if (!Identity.isFolderAuthorized(completeDir)) Unauthorized
     val json = Cache.getOrElse(getCacheKey(completeDir, "dirs"), timeout) {
       val folders = (baseDir + completeDir).children(IsDirectory)
-      val elems = sort(folders.toList.map(MyFile(_)), column, order)
+      val elems = sort(folders.toList.map(MyFile(_, Other)), column, order)
       Json.toJson(elems)
     }
     Ok(json)
@@ -140,8 +142,13 @@ object Api extends Controller with SecuredController {
   private def getLastFiles(identity: Identity, nb: Int) = {
     val paths = identity.folders.map(f => baseDir + '/' + f.path);
     val files = paths.flatMap(p => p ** ("*.{" + moviesExtensions.mkString(",") + "}"))
-    files.sortBy(_.lastModified).reverse.take(nb).map(MyFile(_))
+    files.sortBy(_.lastModified).reverse.take(nb).map { file =>
+      val path = file.path.drop(baseDir.length).split("/")(1)
+      val folderType = identity.folders.filter(_.path == path).headOption.map(_.contentType).get
+      MyFile(file, folderType)
+    }
   }
+
   private def sort(list: List[MyFile], sortColumn: String, sortOrder: String)(implicit request: RequestHeader) = {
     val order = list.sortBy(file => sortColumn match {
       case "name" => file.name.toLowerCase
@@ -162,11 +169,20 @@ object Api extends Controller with SecuredController {
 }
 
 case class MyFile(name: String, rawName: String, path: String, extension: String, lastModified: String, rawLastModified: Long,
-    size: String, rawSize: Long, isFile: Boolean, isMovie: Boolean, details: MyFileDetails)
+    size: String, rawSize: Long, isFile: Boolean, isMovie: Boolean, serieName: Option[String], 
+    folderType: String, details: MyFileDetails)
 case class MyFileDetails(quality: String, lang: String, year: String, season: String, episode: String)
 
 object MyFile {
-  def apply(path: Path): MyFile = {
+  def apply(path: Path, folderType: FolderType): MyFile = {
+    val serieName = folderType match {
+      case TvShow => {
+        val namePart = path.relativize(Api.baseDir).path.split("/")(1)
+        Some(getCleanName(namePart))
+      }
+      case _ => None
+    }
+
     MyFile(
         name      = getCleanName(path.name),
         rawName   = path.name,
@@ -178,6 +194,8 @@ object MyFile {
         rawSize   = path.size.getOrElse(-1),
         isFile    = path.isFile,
         isMovie   = path.extension.map(fileIsMovie).getOrElse(false),
+        serieName = serieName,
+        folderType = folderType.toString,
         details = MyFileDetails(
           quality   = getQuality(path.name),
           lang      = getLang(path.name),

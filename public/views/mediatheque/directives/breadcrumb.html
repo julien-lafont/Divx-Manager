@@ -1,7 +1,10 @@
 <ul class="breadcrumb">
-  <li><a ui-sref="mediatheque">Médiathèque</a> <span class="divider">/</span></li>
-  <li ng-repeat="part in parts">
+  <li><a ui-sref="mediatheque.news">Médiathèque</a> <span class="divider">/</span></li>
+  <li ng-repeat="part in parts" ng-if="!raw">
     <a ui-sref="mediatheque.folder(part)" ng-class="{'active': part.isLast}">{{part.name}}</a>
     <span ng-if="!part.isLast" class="divider">/</span>
+  </li>
+  <li ng-if="raw">
+    <a href="#">{{raw}}</a>
   </li>
 </ul>

@@ -7,8 +7,6 @@
   </div>
 </div>
 
-<div ng-include="'/assets/views/mediatheque/news/news2.html'"></div>
-
 <table class="table table-striped">
   <thead>
     <th></th>
@@ -20,7 +18,7 @@
     <th><a href="javascript:void(0)" ng-click="sort('date')"><sorter column="date" order="order">Date d'ajout</sorter></a></th>
   </thead>
   <tbody id="list-body">
-    <tr entry ng-repeat="entry in list | filterMovies:searchquery"></tr>
+    <tr entry ng-repeat="entry in list | filterMovies: searchquery" item="entry"></tr>
   </tbody>
 </table>
 
