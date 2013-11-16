@@ -18,7 +18,7 @@
     <th><a href="javascript:void(0)" ng-click="sort('date')"><sorter column="date" order="order">Date d'ajout</sorter></a></th>
   </thead>
   <tbody id="list-body">
-    <tr entry ng-repeat="entry in list | filterMovies: searchquery" item="entry" detail="detail"></tr>
+    <tr entry ng-repeat="entry in list | filterMovies: searchquery"></tr>
   </tbody>
 </table>
 

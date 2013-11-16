@@ -6,6 +6,7 @@ angular.module('app.mediatheque')
       function($scope, lastEntries) {
 
         $scope.lastEntries = lastEntries
+        $scope.mixte = true
 
       }]
   )

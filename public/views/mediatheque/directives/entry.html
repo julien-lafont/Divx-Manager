@@ -1,44 +1,44 @@
 <!-- Icon -->
-<td><img ng-src="{{item | fileicon}}" alt="{{item.extension}}" /></td>
+<td><img ng-src="{{entry | fileicon}}" alt="{{entry.extension}}" /></td>
 
 <!-- Name-->
-<td ng-if="item.isFile">
-  <span ng-show="mixte && item.serieName" class="label">{{item.serieName}}</span>
+<td ng-if="entry.isFile">
+  <span ng-show="mixte && entry.serieName" class="label">{{entry.serieName}}</span>
 
-  <a ng-show="item.folderType == 'Movie'" href="javascript:void(0)" ng-click="detail(item)" title="Informations sur le film">{{item.name}}</a>
-  <span ng-show="item.folderType != 'Movie'">{{item.name}}</span>
+  <a ng-show="entry.folderType == 'Movie'" href="javascript:void(0)" ng-click="detail(entry)" title="Informations sur le film">{{entry.name}}</a>
+  <span ng-show="entry.folderType != 'Movie'">{{entry.name}}</span>
 
-  <span ng-if="item.details.year">(<strong>{{item.details.year}}</strong>)</span>
+  <span ng-if="entry.details.year">(<strong>{{entry.details.year}}</strong>)</span>
 
-  <a href="/api/download/{{item.path}}" target="_self" title="Télécharger {{item.name}}">
+  <a href="/api/download/{{entry.path}}" target="_self" title="Télécharger {{entry.name}}">
     <img src="/assets/images/download.png" />
   </a>
 </td>
-<td ng-if="!item.isFile">
-  <a ui-sref="mediatheque.folder({dir: item.path})" title="{{item.rawName}}">{{item.name}}</a>
+<td ng-if="!entry.isFile">
+  <a ui-sref="mediatheque.folder({dir: entry.path})" title="{{entry.rawName}}">{{entry.name}}</a>
 </td>
 
 <!-- TvShow -->
 <td>
-  <span ng-if="item.details.season" class='label label-inverse'>{{item.details.season}}</span>
-  <span ng-if="item.details.episode" class='label label-inverse'>{{item.details.episode}}</span>
+  <span ng-if="entry.details.season" class='label label-inverse'>{{entry.details.season}}</span>
+  <span ng-if="entry.details.episode" class='label label-inverse'>{{entry.details.episode}}</span>
 </td>
 
 <td>
   <!-- Allocine -->
-  <span ng-if="item.isFile && item.folderType == 'Movie'">
-    <a href="http://www.allocine.fr/recherche/1/?q={{item.name}}" target='_blank'><img src='/assets/images/allocine.ico' height='15' width='15' /></a>&nbsp;&nbsp;
+  <span ng-if="entry.isFile && entry.folderType == 'Movie'">
+    <a href="http://www.allocine.fr/recherche/1/?q={{entry.name}}" target='_blank'><img src='/assets/images/allocine.ico' height='15' width='15' /></a>&nbsp;&nbsp;
   </span>
 
   <!-- Qualité -->
-  <span ng-if="item.details.quality == '720p'" class='label label-warning'>720p</span>
-  <span ng-if="item.details.quality == '1080p'" class='label label-important'>1080p</span>
+  <span ng-if="entry.details.quality == '720p'" class='label label-warning'>720p</span>
+  <span ng-if="entry.details.quality == '1080p'" class='label label-important'>1080p</span>
 
   <!-- Langue -->
-  <span ng-if="item.details.lang == 'vostfr'" class='label'>vostfr</span>
-  <span ng-if="item.details.lang == 'multi'" class='label label-success'>multi</span>
-  <span ng-if="item.details.lang == 'vo'" class='label label-warning'>vo</span>
+  <span ng-if="entry.details.lang == 'vostfr'" class='label'>vostfr</span>
+  <span ng-if="entry.details.lang == 'multi'" class='label label-success'>multi</span>
+  <span ng-if="entry.details.lang == 'vo'" class='label label-warning'>vo</span>
 </td>
 
-<td>{{item.size}}</td>
-<td>{{item.lastModified}}</td>
+<td>{{entry.size}}</td>
+<td>{{entry.lastModified}}</td>
