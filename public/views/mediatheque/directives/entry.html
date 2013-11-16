@@ -5,8 +5,8 @@
 <td ng-if="item.isFile">
   <span ng-show="mixte && item.serieName" class="label">{{item.serieName}}</span>
 
-  <a ng-if="item.folderType == 'Movie'" href="javascript:void(0)" ng-click="detail(item)" title="Informations sur le film">{{item.name}}</a>
-  <span ng-if="item.folderType != 'Movie'">{{item.name}}</span>
+  <a ng-show="item.folderType == 'Movie'" href="javascript:void(0)" ng-click="detail(item)" title="Informations sur le film">{{item.name}}</a>
+  <span ng-show="item.folderType != 'Movie'">{{item.name}}</span>
 
   <span ng-if="item.details.year">(<strong>{{item.details.year}}</strong>)</span>
 
