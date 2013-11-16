@@ -108,7 +108,7 @@ object Api extends Controller with SecuredController {
 
   def newFiles = Secured { implicit request =>
     val json = Cache.getOrElse("top10-" + request.user.name, timeout) {
-      Json.toJson(getLastFiles(request.user, 25))
+      Json.toJson(getLastFiles(request.user, 40))
     }
     Ok(json)
   }
