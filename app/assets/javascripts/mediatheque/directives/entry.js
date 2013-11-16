@@ -7,7 +7,8 @@ angular.module('app.mediatheque')
       templateUrl: '/assets/views/mediatheque/directives/entry.html',
       scope: {
         mixte: '=',
-        item: '='
+        item: '=',
+        detail: '&'
       }
     }
   }])
