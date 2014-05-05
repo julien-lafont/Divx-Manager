@@ -1,14 +1,22 @@
 package controllers
 
+import scalax.io._
 import play.api._
 import play.api.mvc._
+
 import services.security.Identity
+import java.text.SimpleDateFormat
 
 object Application extends Controller {
 
+  val statsFile = Resource.fromFile("stats")
+
   def index(angularUri: String = "") = Action { implicit request =>
+    val id = Identity.get.map(_.name).get
+    log(id)
+
     Ok(views.html.index.render())
-      .withSession("identity" -> Identity.get.map(_.name).get)
+      .withSession("identity" -> id)
   }
 
   def unauthorized() = Action { request =>
@@ -19,6 +27,10 @@ object Application extends Controller {
     Redirect("/").withNewSession
   }
 
+  private def log(id: String)(implicit req: RequestHeader) = {
+    val dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    statsFile.append(dateFormater.format(new java.util.Date()) + ";" + id + ";"+req.remoteAddress+"\n")(scalax.io.Codec.UTF8)
+  }
 }
 
 

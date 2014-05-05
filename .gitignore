@@ -16,3 +16,4 @@ dist
 .cache
 public/bower_components/
 .DS_STORE
+stats
