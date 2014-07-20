@@ -32,12 +32,13 @@
 
   <!-- Qualité -->
   <span ng-if="entry.details.quality == '720p'" class='label label-warning'>720p</span>
-  <span ng-if="entry.details.quality == '1080p'" class='label label-important'>1080p</span>
+  <span ng-if="entry.details.quality == '1080p'" class='label label-success'>1080p</span>
 
   <!-- Langue -->
   <span ng-if="entry.details.lang == 'vostfr'" class='label'>vostfr</span>
   <span ng-if="entry.details.lang == 'multi'" class='label label-success'>multi</span>
   <span ng-if="entry.details.lang == 'vo'" class='label label-warning'>vo</span>
+  <span ng-if="entry.details.lang == 'vfq'" class='label label-important'>VFQ</span>
 </td>
 
 <td>{{entry.size}}</td>

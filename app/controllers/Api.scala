@@ -220,7 +220,9 @@ object MyFile {
   private def getLang(name: String) = {
     langs.filter(lang => 
       name.toLowerCase.contains("."+lang) || 
+      name.toLowerCase.contains(". "+lang) || 
       name.toLowerCase.contains("-"+lang) ||
+      name.toLowerCase.contains("- "+lang) ||
       name.toLowerCase.contains("["+lang)
     ).headOption.getOrElse("fr")
   }
